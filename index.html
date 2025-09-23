@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>KPACA AI — Full UI (110 fitur)</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- NOTE: UI-only. Tambahkan script.js untuk fungsionalitas (API, auth, storage) -->
+</head>
+<body class="theme-dark">
+
+  <!-- APP CONTAINER -->
+  <div id="app" class="app-grid">
+
+    <!-- HEADER -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="logo">KP</div>
+        <div class="brand-text">
+          <h1>KPACA AI</h1>
+          <p class="muted">Personal AI — UI demo (110 fitur visible)</p>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <div class="search-wrap">
+          <input id="globalSearch" type="search" placeholder="Cari chat, prompt, file..." aria-label="Search"/>
+        </div>
+
+        <div class="global-actions">
+          <button class="btn small" id="newChatBtn">+ New</button>
+          <button class="btn small outline" id="importBtn">Import</button>
+          <button class="btn small outline" id="exportBtn">Export</button>
+
+          <div class="user-pill">
+            <img alt="avatar" src="https://i.pravatar.cc/40" />
+            <span id="usernameDisplay" class="username">Guest</span>
+            <button class="icon" title="Settings">⚙</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- LEFT SIDEBAR: SESSIONS + NAV -->
+    <aside class="sidebar-left">
+      <div class="sidebar-top">
+        <button class="btn primary full" id="createSession">+ Obrolan Baru</button>
+
+        <div class="session-tools">
+          <button class="btn small" id="restoreBtn">Restore</button>
+          <button class="btn small" id="clearAllBtn">Clear All</button>
+          <button class="btn small" id="backupBtn">Backup</button>
+        </div>
+
+        <div class="section">
+          <h4>Sessions</h4>
+          <div id="sessionList" class="session-list" aria-label="Sessions">
+            <!-- session items (UI placeholders) -->
+            <div class="session-item active" data-id="sess_default">
+              <div class="s-meta">
+                <strong>Obrolan Utama</strong>
+                <div class="muted small">12 pesan • 2h</div>
+              </div>
+              <div class="s-actions">
+                <button class="icon">⋯</button>
+              </div>
+            </div>
+
+            <div class="session-item" data-id="sess_1">
+              <div class="s-meta">
+                <strong>Belajar JS</strong>
+                <div class="muted small">5 pesan • 1d</div>
+              </div>
+              <div class="s-actions"><button class="icon">⋯</button></div>
+            </div>
+
+            <!-- placeholders to reach UI density -->
+            <div class="session-item placeholder">Sesi A</div>
+            <div class="session-item placeholder">Sesi B</div>
+            <div class="session-item placeholder">Sesi C</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h4>Quick Prompts</h4>
+          <div id="quickPrompts" class="quick-prompt">
+            <button class="chip">Ringkas</button>
+            <button class="chip">Tulis Email Profesional</button>
+            <button class="chip">Buat Async Function</button>
+            <button class="chip">Buat Flashcards</button>
+            <button class="chip">Buat Daftar Tugas</button>
+          </div>
+          <div style="margin-top:8px">
+            <button class="small" id="managePrompts">Manage Prompts</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-bottom">
+        <div class="profile-brief">
+          <img class="avatar" alt="avatar" src="https://i.pravatar.cc/60" />
+          <div>
+            <div id="userFull" class="username">Guest User</div>
+            <div class="muted small">Free • Last active: today</div>
+          </div>
+        </div>
+
+        <div class="profile-actions">
+          <button class="btn small outline" id="profileBtn">Profile</button>
+          <button class="btn small outline" id="logoutBtn">Logout</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER: CHAT AREA -->
+    <main class="main-center">
+
+      <!-- CHAT TOPBAR -->
+      <div class="chat-topbar">
+        <div class="chat-title">
+          <h2 id="chatTitle">Obrolan: KPACA AI</h2>
+          <div class="muted small">Model: <select id="modelSelect"><option>gpt-4o-mini</option><option>gpt-4o</option><option>gpt-3.5-turbo</option></select> • Mode: Smart</div>
+        </div>
+
+        <div class="chat-controls">
+          <button class="btn small" id="saveSessionBtn">Save</button>
+          <button class="btn small outline" id="shareSessionBtn">Share</button>
+          <button class="btn small outline" id="exportSessionBtn">Export</button>
+          <button class="btn small outline" id="sessionSettings">Session Settings</button>
+        </div>
+      </div>
+
+      <!-- CHAT WINDOW -->
+      <div class="chat-window" id="chatWindow">
+        <div class="messages" id="messages">
+
+          <!-- pinned -->
+          <div class="pinned-banner">
+            <strong>📌 Pinned:</strong> Gunakan quick prompts untuk mempercepat.
+            <div class="pinned-actions">
+              <button class="small">Edit</button><button class="small">Unpin</button>
+            </div>
+          </div>
+
+          <!-- sample AI message -->
+          <div class="message ai" data-id="m1">
+            <div class="meta">KPACA AI • <span class="muted">now</span></div>
+            <div class="content">
+              Halo — saya KPACA AI. Bisa bantu bikin kode (async function), ringkasan dokumen, terjemahan, dan membuat gambar HD.
+            </div>
+            <div class="msg-tools">
+              <button class="small">⭐</button>
+              <button class="small">📌</button>
+              <button class="small">✏️</button>
+              <button class="small">🔗</button>
+            </div>
+          </div>
+
+          <!-- sample user message -->
+          <div class="message user" data-id="m2">
+            <div class="meta">You • <span class="muted">now</span></div>
+            <div class="content">Tolong buat contoh async function fetch API yang rapi.</div>
+            <div class="msg-tools">
+              <button class="small">✏️</button>
+              <button class="small">🗑️</button>
+            </div>
+          </div>
+
+          <!-- sample code block -->
+          <div class="message ai code" data-id="m3">
+            <div class="meta">KPACA AI • <span class="muted">now</span></div>
+            <pre><code>// contoh async function
+async function fetchData(url) {
+  try {
+    const r = await fetch(url);
+    const data = await r.json();
+    return data;
+  } catch (err) {
+    console.error(err);
+  }
+}</code></pre>
+            <div class="msg-tools">
+              <button class="small">Salin</button>
+              <button class="small">Run (sandbox)</button>
+            </div>
+          </div>
+
+          <!-- sample image result -->
+          <div class="message ai" data-id="m4">
+            <div class="meta">KPACA AI • <span class="muted">5m</span></div>
+            <div class="content">
+              <strong>Gambar HD (preview)</strong>
+              <div class="image-inline"><img src="https://picsum.photos/seed/ai1/420/240" alt="ai-img" /></div>
+              <div class="msg-tools">
+                <button class="small">Variations</button><button class="small">Download</button><button class="small">Edit</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- long placeholder history -->
+          <div class="message ai" data-id="m5">
+            <div class="meta">KPACA AI • <span class="muted">yesterday</span></div>
+            <div class="content">
+              <strong>Ringkasan Dokumen:</strong>
+              <p>Bagian ringkasan panjang ditampilkan di sini — fitur Summarize dan Translate dapat dipanggil dari toolbar.</p>
+            </div>
+            <div class="msg-tools"><button class="small">⭐</button></div>
+          </div>
+
+        </div>
+
+        <!-- typing indicator (UI-only) -->
+        <div class="typing-indicator">
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+          <span class="muted">KPACA AI sedang mengetik...</span>
+        </div>
+      </div>
+
+      <!-- COMPOSER -->
+      <div class="composer">
+        <div class="composer-left">
+          <button class="btn small outline" title="Attach file">📎</button>
+          <button class="btn small outline" title="Upload image">📷</button>
+          <button class="btn small outline" title="Voice input">🎤</button>
+          <div class="muted small">0 / 1000</div>
+        </div>
+
+        <div class="composer-middle">
+          <textarea id="inputText" placeholder="Ketik pesan atau gunakan quick prompts..."></textarea>
+          <div class="quick-row">
+            <button class="chip">Ringkas</button><button class="chip">Buat Email</button><button class="chip">Debug Kode</button>
+            <button class="chip">Terjemahkan</button><button class="chip">Gambar HD</button>
+          </div>
+        </div>
+
+        <div class="composer-right">
+          <select id="langSelect" aria-label="Language">
+            <option value="auto">Auto-detect</option>
+            <option value="id">Indonesia</option>
+            <option value="en">English</option>
+            <option value="jp">日本語</option>
+            <option value="es">Español</option>
+          </select>
+          <button class="btn primary large" id="sendBtn">Kirim</button>
+        </div>
+      </div>
+
+      <!-- WIDGETS: quick tools and code tools -->
+      <div class="composer-widgets">
+        <div class="widget">
+          <h4>Quick Tools</h4>
+          <div class="tool-row">
+            <button class="btn small">Grammar Check</button>
+            <button class="btn small">Summarize</button>
+            <button class="btn small">Translate</button>
+            <button class="btn small">Extract Q&A</button>
+            <button class="btn small">Explain Like I'm 5</button>
+          </div>
+        </div>
+
+        <div class="widget">
+          <h4>Code Tools</h4>
+          <div class="tool-row">
+            <button class="btn small">Async Function</button>
+            <button class="btn small">Format Code</button>
+            <button class="btn small">Run JS (Sandbox)</button>
+            <button class="btn small">Lint</button>
+            <button class="btn small">Generate Boilerplate</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- RIGHT SIDEBAR: TOOLS & SETTINGS -->
+    <aside class="sidebar-right">
+      <div class="right-section">
+        <h3>Image Generator — HD</h3>
+        <label>Prompt</label>
+        <textarea id="imgPrompt" placeholder="Contoh: 'portrait of a cyberpunk samurai, cinematic lighting'"></textarea>
+
+        <div class="row">
+          <select id="imgStyle">
+            <option>Photorealistic</option><option>Anime</option><option>Cartoon</option><option>3D</option><option>Oil Painting</option>
+          </select>
+          <select id="imgSize">
+            <option>512</option><option selected>1024</option><option>2048</option>
+          </select>
+        </div>
+
+        <div class="image-options">
+          <label><input type="checkbox" /> Upscale HD</label>
+          <label><input type="checkbox" /> Background remove</label>
+          <label><input type="checkbox" /> Transparent background</label>
+          <label><input type="checkbox" /> Add watermark</label>
+        </div>
+
+        <div class="image-actions">
+          <button class="btn primary">Generate HD</button>
+          <button class="btn small outline">Variations</button>
+          <button class="btn small outline">Edit (Inpaint)</button>
+          <button class="btn small outline">Save</button>
+        </div>
+
+        <div class="image-gallery">
+          <div class="image-item"><img src="https://picsum.photos/seed/a/200/120" alt="preview" /></div>
+          <div class="image-item"><img src="https://picsum.photos/seed/b/200/120" alt="preview" /></div>
+          <div class="image-item"><img src="https://picsum.photos/seed/c/200/120" alt="preview" /></div>
+        </div>
+      </div>
+
+      <div class="right-section">
+        <h3>File & OCR</h3>
+        <div class="muted small">Drag & drop file di area upload</div>
+        <div class="file-drop">Drop files here (PDF, TXT, DOCX)</div>
+        <div class="file-preview">
+          <div class="file-item">
+            <div class="file-meta">
+              <strong>document.pdf</strong><span class="muted">• 1.2MB</span>
+            </div>
+            <div class="file-actions">
+              <button class="small">Preview</button>
+              <button class="small">Summarize</button>
+              <button class="small">Extract Q&A</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="right-section">
+        <h3>Voice & Audio</h3>
+        <div class="muted small">Record & transcribe, text-to-speech</div>
+        <div class="audio-row">
+          <button class="btn small outline">Record</button>
+          <button class="btn small">Stop</button>
+          <button class="btn small">Transcribe</button>
+        </div>
+
+        <label>Text-to-Speech voice</label>
+        <select>
+          <option>Female (ID)</option><option>Male (ID)</option><option>English Female</option>
+        </select>
+        <div class="audio-actions">
+          <button class="btn small">Play</button><button class="btn small outline">Download</button>
+        </div>
+      </div>
+
+      <div class="right-section">
+        <h3>Utilities & Exports</h3>
+        <div class="muted small">Export session, import, backup, cloud sync</div>
+        <div class="tool-list">
+          <button class="small">Export JSON</button>
+          <button class="small">Export TXT</button>
+          <button class="small">Download PDF</button>
+          <button class="small">Backup to Google Drive</button>
+          <button class="small">Connect Dropbox</button>
+        </div>
+      </div>
+
+      <div class="right-section">
+        <h3>Admin / Owner</h3>
+        <div class="muted small">Owner-level controls (UI only)</div>
+        <ul class="compact-list">
+          <li>/addadmin [id]</li><li>/deladmin [id]</li><li>/addres [id]</li><li>/delres [id]</li>
+          <li>/addsaldo [id] [jumlah]</li><li>/resetallsaldo</li><li>/broadcast [msg]</li>
+        </ul>
+      </div>
+
+      <div class="right-section small muted">
+        <h4>Extra Tools</h4>
+        <div class="muted small">Mindmap generator, flashcard maker, resume builder, roadmap planner</div>
+        <div style="margin-top:8px">
+          <button class="small">Mindmap</button>
+          <button class="small">Flashcards</button>
+          <button class="small">Resume</button>
+          <button class="small">Roadmap</button>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- FOOTER -->
+    <footer class="app-footer">
+      <div class="footer-left muted small">KPACA AI • UI-only demo • 110 features (placeholders)</div>
+      <div class="footer-right">
+        <button class="small">Help</button>
+        <button class="small outline">Privacy</button>
+        <button class="small outline">Terms</button>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- AUTH / SIGNUP DIALOG (UI only) -->
+  <div class="modal" id="authModal" aria-hidden="true">
+    <div class="modal-inner">
+      <h3>Daftar / Login ke KPACA AI</h3>
+      <div class="auth-grid">
+        <div class="auth-box">
+          <h4>Daftar</h4>
+          <input placeholder="Nama lengkap" />
+          <input placeholder="Email" />
+          <input placeholder="Nomor telepon (opsional)" />
+          <input placeholder="Password" type="password" />
+          <div class="muted small">atau daftar dengan</div>
+          <div class="social-row">
+            <button class="btn small">Google</button>
+            <button class="btn small">Facebook</button>
+            <button class="btn small">Apple</button>
+          </div>
+          <button class="btn primary full">Daftar & Verifikasi</button>
+        </div>
+
+        <div class="auth-box">
+          <h4>Login</h4>
+          <input placeholder="Email atau nomor telepon" />
+          <input placeholder="Password" type="password" />
+          <label><input type="checkbox" /> Ingat saya</label>
+          <button class="btn primary full">Login</button>
+          <button class="btn small outline full">Lupa password?</button>
+        </div>
+      </div>
+      <div class="muted small">Catatan: Verifikasi email / OAuth memerlukan backend.</div>
+    </div>
+  </div>
+
+  <!-- SETTINGS DRAWER (UI only) -->
+  <aside class="settings-drawer" id="settingsDrawer" aria-hidden="true">
+    <h3>Settings</h3>
+    <div class="setting-group">
+      <label>Theme</label>
+      <select><option>Dark</option><option>Light</option><option>Auto</option></select>
+
+      <label>Accent</label>
+      <select><option>Purple</option><option>Blue</option><option>Green</option><option>Red</option></select>
+
+      <label>Interface language</label>
+      <select><option>Bahasa Indonesia</option><option>English</option><option>Español</option></select>
+
+      <label><input type="checkbox" /> Auto-translate incoming messages</label>
+      <label><input type="checkbox" /> Use offline mode (cache)</label>
+    </div>
+
+    <div class="setting-group">
+      <h4>Security</h4>
+      <label><input type="checkbox" /> Enable 2FA</label>
+      <label><input type="checkbox" /> Require PIN on open</label>
+      <label><input type="checkbox" /> Biometric unlock</label>
+    </div>
+
+    <div class="setting-group">
+      <h4>Integrations</h4>
+      <button class="small">Connect Google Drive</button>
+      <button class="small">Connect Dropbox</button>
+      <button class="small">Connect Slack</button>
+      <button class="small">Connect Zapier</button>
+    </div>
+  </aside>
+
+  <!-- CREDITS -->
+  <div class="credits">
+    <small>Design: KPACA UI demo — HTML & CSS only. Add script.js for real features (OpenAI API, OAuth, voice, OCR, image gen).</small>
+  </div>
+
+</body>
+</html>
