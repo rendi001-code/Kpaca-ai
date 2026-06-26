@@ -9,14 +9,12 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Pengaturan
-const API_KEY = process.env.API_KEY || "";
-const SUPABASE_URL = process.env.SUPABASE_URL || "https://safwstugkkfpnfbabakw.supabase.co";
-const SUPABASE_KEY = process.env.SUPABASE_KEY || "sb_publishable_3MQCz-f8AvoiBOtCfRY0PQ_ASRpiVav";
+// Kunci sudah dimasukkan langsung di sini
+const API_KEY = "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";
+const SUPABASE_URL = "https://safwstugkkfpnfbabakw.supabase.co";
+const SUPABASE_KEY = "sb_publishable_3MQCz-f8AvoiBOtCfRY0PQ_ASRpiVav";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-const API_URL = "https://api.openai.com/v1/chat/completions";
-const AI_MODEL = "gpt-3.5-turbo";
 
 app.set('trust proxy', 1);
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -24,59 +22,55 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
 
-// Halaman
-app.get('/', (req, res) => {
-  if(req.cookies.user_id) return res.redirect('/chat');
-  res.sendFile(path.join(__dirname, 'public/index.html'));
-});
+app.get('/', (req, res) => req.cookies.user_id ? res.redirect('/chat') : res.sendFile(path.join(__dirname, 'public/index.html')));
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public/login.html')));
 app.get('/register', (req, res) => res.sendFile(path.join(__dirname, 'public/register.html')));
 app.get('/chat', async (req, res) => {
   if(!req.cookies.user_id) return res.redirect('/login');
-  // Cek apakah pengguna benar ada
   const { data } = await supabase.from('users').select('id').eq('id', req.cookies.user_id).single();
-  if(!data) { res.clearCookie('user_id'); return res.redirect('/login'); }
-  res.sendFile(path.join(__dirname, 'public/chat.html'));
+  data ? res.sendFile(path.join(__dirname, 'public/chat.html')) : res.clearCookie('user_id').redirect('/login');
 });
 
-// Daftar
 app.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
-  if(!username||!email||!password) return res.send('<script>alert("Isi semua!");history.back();</script>');
+  if(!username||!email||!password) return res.send('<script>alert("Isi semua kolom!");history.back();</script>');
   const hash = await bcrypt.hash(password,10);
   const { error } = await supabase.from('users').insert([{username,email,password:hash}]);
   if(error) return res.send('<script>alert("Sudah dipakai!");history.back();</script>');
   res.redirect('/login');
 });
 
-// Masuk pakai KUKI, bukan sesi
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   const { data:user, error } = await supabase.from('users').select('*').eq('username',username).single();
-  if(error||!user||!await bcrypt.compare(password, user.password)) {
-    return res.send('<script>alert("Salah!");history.back();</script>');
-  }
-  // Simpan ID di kukinya
+  if(error||!user||!await bcrypt.compare(password, user.password)) return res.send('<script>alert("Salah nama atau sandi!");history.back();</script>');
   res.cookie('user_id', user.id, { maxAge: 86400000, secure: true, httpOnly: true, sameSite:'lax' });
   res.redirect('/chat');
 });
 
-// Obrolan
 app.post('/api/chat', async (req, res) => {
-  if(!req.cookies.user_id) return res.json({jawaban:"Masuk dulu!"});
-  if(!API_KEY) return res.json({jawaban:"Kunci kosong!"});
+  if(!req.cookies.user_id) return res.json({jawaban: "Masuk dulu!"});
+
   try {
-    const r = await fetch(API_URL, {
+    const r = await fetch("https://api.openai.com/v1/chat/completions", {
       method:"POST",
-      headers:{"Authorization":`Bearer ${API_KEY}`,"Content-Type":"application/json"},
-      body:JSON.stringify({model:AI_MODEL,messages:[{role:"user",content:req.body.message}]})
+      headers:{
+        "Authorization":`Bearer ${API_KEY}`,
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        model: "gpt-3.5-turbo",
+        messages: [{role:"user", content: req.body.message}]
+      })
     });
-    const d = await r.json();
-    res.json({jawaban:d.choices?.[0]?.message?.content||"Kosong"});
-  } catch(e) { res.json({jawaban:"Salah: "+e.message}); }
+    const hasil = await r.json();
+    if(hasil.error) throw new Error(hasil.error.message);
+    res.json({jawaban: hasil.choices[0].message.content});
+  } catch (e) {
+    res.json({jawaban: "Kesalahan: " + e.message});
+  }
 });
 
-// Keluar
 app.get('/logout', (req,res) => { res.clearCookie('user_id'); res.redirect('/'); });
 
 app.listen(PORT, ()=>console.log("Siap"));
