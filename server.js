@@ -1,4 +1,4 @@
-const express = require('express');
+    const express = require('express');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const fetch = require('node-fetch');
@@ -9,10 +9,10 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Kunci sudah dimasukkan langsung di sini
-const API_KEY = "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";
-const SUPABASE_URL = "https://safwstugkkfpnfbabakw.supabase.co";
-const SUPABASE_KEY = "sb_publishable_3MQCz-f8AvoiBOtCfRY0PQ_ASRpiVav";
+// Ambil dari pengaturan Vercel
+const API_KEY = process.env.API_KEY;
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_KEY;
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -50,6 +50,7 @@ app.post('/login', async (req, res) => {
 
 app.post('/api/chat', async (req, res) => {
   if(!req.cookies.user_id) return res.json({jawaban: "Masuk dulu!"});
+  if(!API_KEY) return res.json({jawaban: "Kunci API belum diatur!"});
 
   try {
     const r = await fetch("https://api.openai.com/v1/chat/completions", {
