@@ -9,8 +9,8 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Kunci Mistral sudah dimasukkan
-const MISTRAL_KEY = "eXhe3sfurmLyFuVGBUDsKOX8HQS3t0kW";
+// Kunci OpenAI sudah dimasukkan
+const API_KEY = "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";
 const SUPABASE_URL = "https://safwstugkkfpnfbabakw.supabase.co";
 const SUPABASE_KEY = "sb_publishable_3MQCz-f8AvoiBOtCfRY0PQ_ASRpiVav";
 
@@ -48,19 +48,19 @@ app.post('/login', async (req, res) => {
   res.redirect('/chat');
 });
 
-// Panggil Mistral AI
+// Panggil OpenAI
 app.post('/api/chat', async (req, res) => {
   if(!req.cookies.user_id) return res.json({jawaban: "Masuk dulu!"});
 
   try {
-    const r = await fetch("https://api.mistral.ai/v1/chat/completions", {
+    const r = await fetch("https://api.openai.com/v1/chat/completions", {
       method:"POST",
       headers:{
-        "Authorization": `Bearer ${MISTRAL_KEY}`,
+        "Authorization": `Bearer ${API_KEY}`,
         "Content-Type": "application/json"
       },
       body:JSON.stringify({
-        model: "mistral-tiny",
+        model: "gpt-3.5-turbo",
         messages: [{ role: "user", content: req.body.message }]
       })
     });
