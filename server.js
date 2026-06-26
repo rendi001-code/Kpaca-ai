@@ -9,8 +9,8 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Semua kunci sudah diisi di sini
-const API_KEY = "AQ.Ab8RN6KOjHmpjQ39JbkWg3-YkUFKn5magy8DkHjBrW0YTkolkA";
+// Kunci Mistral sudah dimasukkan
+const MISTRAL_KEY = "eXhe3sfurmLyFuVGBUDsKOX8HQS3t0kW";
 const SUPABASE_URL = "https://safwstugkkfpnfbabakw.supabase.co";
 const SUPABASE_KEY = "sb_publishable_3MQCz-f8AvoiBOtCfRY0PQ_ASRpiVav";
 
@@ -48,21 +48,25 @@ app.post('/login', async (req, res) => {
   res.redirect('/chat');
 });
 
-// Panggil Gemini
+// Panggil Mistral AI
 app.post('/api/chat', async (req, res) => {
   if(!req.cookies.user_id) return res.json({jawaban: "Masuk dulu!"});
 
   try {
-    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`, {
+    const r = await fetch("https://api.mistral.ai/v1/chat/completions", {
       method:"POST",
-      headers:{"Content-Type":"application/json"},
+      headers:{
+        "Authorization": `Bearer ${MISTRAL_KEY}`,
+        "Content-Type": "application/json"
+      },
       body:JSON.stringify({
-        contents: [{ parts: [{ text: req.body.message }] }]
+        model: "mistral-tiny",
+        messages: [{ role: "user", content: req.body.message }]
       })
     });
     const hasil = await r.json();
     if(hasil.error) throw new Error(hasil.error.message);
-    const teks = hasil.candidates[0].content.parts[0].text;
+    const teks = hasil.choices[0].message.content;
     res.json({jawaban: teks});
   } catch (e) {
     res.json({jawaban: "Kesalahan: " + e.message});
