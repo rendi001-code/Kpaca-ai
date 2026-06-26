@@ -10,7 +10,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Kunci sudah dimasukkan langsung di sini
-const API_KEY = "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";
+const API_KEY = "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";
 const SUPABASE_URL = "https://safwstugkkfpnfbabakw.supabase.co";
 const SUPABASE_KEY = "sb_publishable_3MQCz-f8AvoiBOtCfRY0PQ_ASRpiVav";
 
