@@ -2,40 +2,33 @@ const chatBox = document.getElementById('chat-box');
 const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
 
-function addMessage(text, isUser, isLoading=false) {
-  const div = document.createElement('div');
-  if(isLoading){
-    div.className='message proses';
-    div.innerHTML='<span>Sedang berpikir</span><span class="typing"><span></span><span></span><span></span></span>';
-  } else {
-    div.className=`message ${isUser?'user':'ai'}`;
-    div.textContent=text;
-  }
-  chatBox.appendChild(div);
-  chatBox.scrollTop=chatBox.scrollHeight;
-  return div;
+function tambahPesan(teks, pengirim) {
+  const el = document.createElement('div');
+  el.className = `message ${pengirim}`;
+  el.textContent = teks;
+  chatBox.appendChild(el);
+  chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-async function sendMessage(){
-  const teks=userInput.value.trim();
-  if(!teks) return;
-  addMessage(teks,true);
-  userInput.value='';
-  const muatan=addMessage('',false,true);
-  try{
-    const res=await fetch('/api/chat',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({message:teks})
+async function kirimPesan() {
+  const teks = userInput.value.trim();
+  if (!teks) return;
+
+  tambahPesan(teks, 'user');
+  userInput.value = '';
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: teks })
     });
-    const hasil=await res.json();
-    chatBox.removeChild(muatan);
-    addMessage(hasil.jawaban||"Maaf, belum bisa menjawab.",false);
-  }catch(e){
-    chatBox.removeChild(muatan);
-    addMessage("⚠️ Gangguan sambungan.",false);
+    const data = await res.json();
+    tambahPesan(data.jawaban, 'ai');
+  } catch (e) {
+    tambahPesan('Gagal terhubung ke peladen', 'ai');
   }
 }
 
-sendBtn.addEventListener('click',sendMessage);
-userInput.addEventListener('keypress',e=>e.key==='Enter'&&sendMessage());
+sendBtn.addEventListener('click', kirimPesan);
+userInput.addEventListener('keydown', e => e.key === 'Enter' && kirimPesan());
