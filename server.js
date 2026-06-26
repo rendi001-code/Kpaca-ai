@@ -1,4 +1,4 @@
-    const express = require('express');
+const express = require('express');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const fetch = require('node-fetch');
@@ -9,10 +9,10 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Ambil dari pengaturan Vercel
-const API_KEY = process.env.API_KEY;
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_KEY;
+// Semua kunci sudah diisi di sini
+const API_KEY = "AQ.Ab8RN6KOjHmpjQ39JbkWg3-YkUFKn5magy8DkHjBrW0YTkolkA";
+const SUPABASE_URL = "https://safwstugkkfpnfbabakw.supabase.co";
+const SUPABASE_KEY = "sb_publishable_3MQCz-f8AvoiBOtCfRY0PQ_ASRpiVav";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -48,25 +48,22 @@ app.post('/login', async (req, res) => {
   res.redirect('/chat');
 });
 
+// Panggil Gemini
 app.post('/api/chat', async (req, res) => {
   if(!req.cookies.user_id) return res.json({jawaban: "Masuk dulu!"});
-  if(!API_KEY) return res.json({jawaban: "Kunci API belum diatur!"});
 
   try {
-    const r = await fetch("https://api.openai.com/v1/chat/completions", {
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`, {
       method:"POST",
-      headers:{
-        "Authorization":`Bearer ${API_KEY}`,
-        "Content-Type":"application/json"
-      },
+      headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: [{role:"user", content: req.body.message}]
+        contents: [{ parts: [{ text: req.body.message }] }]
       })
     });
     const hasil = await r.json();
     if(hasil.error) throw new Error(hasil.error.message);
-    res.json({jawaban: hasil.choices[0].message.content});
+    const teks = hasil.candidates[0].content.parts[0].text;
+    res.json({jawaban: teks});
   } catch (e) {
     res.json({jawaban: "Kesalahan: " + e.message});
   }
