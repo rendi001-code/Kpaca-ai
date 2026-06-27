@@ -9,7 +9,7 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Tempel kunci Gemini (AIzaSy...) di sini
+// Kunci kamu sudah dimasukkan
 const GEMINI_KEY = "AQ.Ab8RN6J75NpXI65O0unXVSrUKIDBz8z0jfYPWXp1CfEIafXB2w";
 const SUPABASE_URL = "https://safwstugkkfpnfbabakw.supabase.co";
 const SUPABASE_KEY = "sb_publishable_3MQCz-f8AvoiBOtCfRY0PQ_ASRpiVav";
@@ -63,10 +63,8 @@ app.post('/login', async (req, res) => {
 // Panggil Gemini
 app.post('/api/chat', async (req, res) => {
   if(!req.cookies.user_id) return res.json({jawaban: "Masuk dulu!"});
-  if(!GEMINI_KEY || GEMINI_KEY === "ISI_KUNCI_KAMU_DI_SINI") return res.json({jawaban: "Kunci belum diatur!"});
-
   try {
-    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_KEY}`, {
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`, {
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
