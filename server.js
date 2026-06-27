@@ -9,7 +9,6 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Kunci Groq yang baru
 const GROQ_KEY = "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";
 const SUPABASE_URL = "https://safwstugkkfpnfbabakw.supabase.co";
 const SUPABASE_KEY = "sb_publishable_3MQCz-f8AvoiBOtCfRY0PQ_ASRpiVav";
@@ -60,7 +59,7 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Panggil Groq
+// Panggil Groq dengan model terbaru
 app.post('/api/chat', async (req, res) => {
   if(!req.cookies.user_id) return res.json({jawaban: "Masuk dulu!"});
   try {
@@ -71,7 +70,7 @@ app.post('/api/chat', async (req, res) => {
         "Content-Type": "application/json"
       },
       body:JSON.stringify({
-        model: "llama3-8b-8192",
+        model: "llama3-8b-instant",
         messages: [{ role: "user", content: req.body.message }],
         temperature: 0.7
       })
