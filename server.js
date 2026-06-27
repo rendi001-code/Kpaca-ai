@@ -9,8 +9,8 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Kunci OpenAI sudah dimasukkan
-const API_KEY = "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";
+// Your new Groq API key is already inserted here
+const GROQ_KEY = "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";
 const SUPABASE_URL = "https://safwstugkkfpnfbabakw.supabase.co";
 const SUPABASE_KEY = "sb_publishable_3MQCz-f8AvoiBOtCfRY0PQ_ASRpiVav";
 
@@ -48,25 +48,27 @@ app.post('/login', async (req, res) => {
   res.redirect('/chat');
 });
 
-// Panggil OpenAI
+// Call Groq (Llama 3) — very fast & free
 app.post('/api/chat', async (req, res) => {
   if(!req.cookies.user_id) return res.json({jawaban: "Masuk dulu!"});
 
   try {
-    const r = await fetch("https://api.openai.com/v1/chat/completions", {
+    const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method:"POST",
       headers:{
-        "Authorization": `Bearer ${API_KEY}`,
+        "Authorization": `Bearer ${GROQ_KEY}`,
         "Content-Type": "application/json"
       },
       body:JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: [{ role: "user", content: req.body.message }]
+        model: "llama3-8b-8192",
+        messages: [{ role: "user", content: req.body.message }],
+        temperature: 0.7
       })
     });
     const hasil = await r.json();
     if(hasil.error) throw new Error(hasil.error.message);
-    const teks = hasil.choices[0].message.content;
+    let teks = hasil.choices[0].message.content;
+    teks = teks.replace(/\*\*/g,'').replace(/###/g,'');
     res.json({jawaban: teks});
   } catch (e) {
     res.json({jawaban: "Kesalahan: " + e.message});
@@ -77,3 +79,11 @@ app.get('/logout', (req,res) => { res.clearCookie('user_id'); res.redirect('/');
 
 app.listen(PORT, ()=>console.log("Siap"));
 module.exports = app;
+}
+
+**Next Steps:**
+1. Replace the entire content of your `server.js` file with the code above.
+2. Commit and push the changes to GitHub.
+3. Go to Vercel → **Deployments** → click the three dots → **Redeploy**.
+
+Your chatbot will now use the new API key. It's fast, free, and ready to use!
