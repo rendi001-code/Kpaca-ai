@@ -9,7 +9,7 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Your new Groq API key is already inserted here
+// Kunci Groq yang baru
 const GROQ_KEY = "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";
 const SUPABASE_URL = "https://safwstugkkfpnfbabakw.supabase.co";
 const SUPABASE_KEY = "sb_publishable_3MQCz-f8AvoiBOtCfRY0PQ_ASRpiVav";
@@ -27,31 +27,42 @@ app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public/login.
 app.get('/register', (req, res) => res.sendFile(path.join(__dirname, 'public/register.html')));
 app.get('/chat', async (req, res) => {
   if(!req.cookies.user_id) return res.redirect('/login');
-  const { data } = await supabase.from('users').select('id').eq('id', req.cookies.user_id).single();
-  data ? res.sendFile(path.join(__dirname, 'public/chat.html')) : res.clearCookie('user_id').redirect('/login');
+  try {
+    const { data } = await supabase.from('users').select('id').eq('id', req.cookies.user_id).single();
+    data ? res.sendFile(path.join(__dirname, 'public/chat.html')) : res.clearCookie('user_id').redirect('/login');
+  } catch {
+    res.clearCookie('user_id').redirect('/login');
+  }
 });
 
 app.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
   if(!username||!email||!password) return res.send('<script>alert("Isi semua kolom!");history.back();</script>');
-  const hash = await bcrypt.hash(password,10);
-  const { error } = await supabase.from('users').insert([{username,email,password:hash}]);
-  if(error) return res.send('<script>alert("Sudah dipakai!");history.back();</script>');
-  res.redirect('/login');
+  try {
+    const hash = await bcrypt.hash(password,10);
+    const { error } = await supabase.from('users').insert([{username,email,password:hash}]);
+    if(error) return res.send('<script>alert("Sudah dipakai!");history.back();</script>');
+    res.redirect('/login');
+  } catch {
+    res.send('<script>alert("Kesalahan pendaftaran!");history.back();</script>');
+  }
 });
 
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
-  const { data:user, error } = await supabase.from('users').select('*').eq('username',username).single();
-  if(error||!user||!await bcrypt.compare(password, user.password)) return res.send('<script>alert("Salah nama atau sandi!");history.back();</script>');
-  res.cookie('user_id', user.id, { maxAge: 86400000, secure: true, httpOnly: true, sameSite:'lax' });
-  res.redirect('/chat');
+  try {
+    const { data:user, error } = await supabase.from('users').select('*').eq('username',username).single();
+    if(error||!user||!await bcrypt.compare(password, user.password)) return res.send('<script>alert("Salah nama atau sandi!");history.back();</script>');
+    res.cookie('user_id', user.id, { maxAge: 86400000, secure: true, httpOnly: true, sameSite:'lax' });
+    res.redirect('/chat');
+  } catch {
+    res.send('<script>alert("Kesalahan masuk!");history.back();</script>');
+  }
 });
 
-// Call Groq (Llama 3) — very fast & free
+// Panggil Groq
 app.post('/api/chat', async (req, res) => {
   if(!req.cookies.user_id) return res.json({jawaban: "Masuk dulu!"});
-
   try {
     const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method:"POST",
@@ -77,13 +88,5 @@ app.post('/api/chat', async (req, res) => {
 
 app.get('/logout', (req,res) => { res.clearCookie('user_id'); res.redirect('/'); });
 
-app.listen(PORT, ()=>console.log("Siap"));
+app.listen(PORT, ()=>console.log("Siap di port", PORT));
 module.exports = app;
-}
-
-**Next Steps:**
-1. Replace the entire content of your `server.js` file with the code above.
-2. Commit and push the changes to GitHub.
-3. Go to Vercel → **Deployments** → click the three dots → **Redeploy**.
-
-Your chatbot will now use the new API key. It's fast, free, and ready to use!
