@@ -9,7 +9,8 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const GROQ_KEY = "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";
+// Tempel kunci Gemini (AIzaSy...) di sini
+const GEMINI_KEY = "AQ.Ab8RN6J75NpXI65O0unXVSrUKIDBz8z0jfYPWXp1CfEIafXB2w";
 const SUPABASE_URL = "https://safwstugkkfpnfbabakw.supabase.co";
 const SUPABASE_KEY = "sb_publishable_3MQCz-f8AvoiBOtCfRY0PQ_ASRpiVav";
 
@@ -59,25 +60,23 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Panggil Groq dengan model terbaru
+// Panggil Gemini
 app.post('/api/chat', async (req, res) => {
   if(!req.cookies.user_id) return res.json({jawaban: "Masuk dulu!"});
+  if(!GEMINI_KEY || GEMINI_KEY === "ISI_KUNCI_KAMU_DI_SINI") return res.json({jawaban: "Kunci belum diatur!"});
+
   try {
-    const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_KEY}`, {
       method:"POST",
-      headers:{
-        "Authorization": `Bearer ${GROQ_KEY}`,
-        "Content-Type": "application/json"
-      },
+      headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
-        model: "llama3-8b-instant",
-        messages: [{ role: "user", content: req.body.message }],
-        temperature: 0.7
+        contents: [{ parts: [{ text: req.body.message }] }],
+        generationConfig: { temperature: 0.7 }
       })
     });
     const hasil = await r.json();
     if(hasil.error) throw new Error(hasil.error.message);
-    let teks = hasil.choices[0].message.content;
+    let teks = hasil.candidates[0].content.parts[0].text;
     teks = teks.replace(/\*\*/g,'').replace(/###/g,'');
     res.json({jawaban: teks});
   } catch (e) {
