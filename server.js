@@ -9,8 +9,8 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Kunci kamu sudah dimasukkan
-const GEMINI_KEY = "AQ.Ab8RN6J75NpXI65O0unXVSrUKIDBz8z0jfYPWXp1CfEIafXB2w";
+// Kunci Hugging Face kamu sudah dimasukkan
+const HF_TOKEN = "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";
 const SUPABASE_URL = "https://safwstugkkfpnfbabakw.supabase.co";
 const SUPABASE_KEY = "sb_publishable_3MQCz-f8AvoiBOtCfRY0PQ_ASRpiVav";
 
@@ -60,22 +60,25 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Panggil Gemini
+// Panggil model Mistral, jawaban santai dan tidak kaku
 app.post('/api/chat', async (req, res) => {
   if(!req.cookies.user_id) return res.json({jawaban: "Masuk dulu!"});
+
   try {
-    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`, {
+    const r = await fetch("https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3", {
       method:"POST",
-      headers:{"Content-Type":"application/json"},
+      headers:{
+        "Authorization": `Bearer ${HF_TOKEN}`,
+        "Content-Type": "application/json"
+      },
       body:JSON.stringify({
-        contents: [{ parts: [{ text: req.body.message }] }],
-        generationConfig: { temperature: 0.7 }
+        inputs: `Kamu adalah KPACA AI, bicaralah bahasa Indonesia sehari-hari, santai, ramah, tidak berlebihan. Pertanyaan: ${req.body.message} Jawaban:`,
+        parameters: { max_new_tokens: 400, temperature: 0.8 }
       })
     });
     const hasil = await r.json();
     if(hasil.error) throw new Error(hasil.error.message);
-    let teks = hasil.candidates[0].content.parts[0].text;
-    teks = teks.replace(/\*\*/g,'').replace(/###/g,'');
+    const teks = hasil[0].generated_text.split("Jawaban:")[1]?.trim() || hasil[0].generated_text;
     res.json({jawaban: teks});
   } catch (e) {
     res.json({jawaban: "Kesalahan: " + e.message});
