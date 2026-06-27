@@ -9,7 +9,7 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Kunci Hugging Face kamu sudah dimasukkan
+// Kunci Hugging Face kamu
 const HF_TOKEN = "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";
 const SUPABASE_URL = "https://safwstugkkfpnfbabakw.supabase.co";
 const SUPABASE_KEY = "sb_publishable_3MQCz-f8AvoiBOtCfRY0PQ_ASRpiVav";
@@ -60,7 +60,7 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Panggil model Mistral, jawaban santai dan tidak kaku
+// Panggil Hugging Face
 app.post('/api/chat', async (req, res) => {
   if(!req.cookies.user_id) return res.json({jawaban: "Masuk dulu!"});
 
@@ -72,14 +72,13 @@ app.post('/api/chat', async (req, res) => {
         "Content-Type": "application/json"
       },
       body:JSON.stringify({
-        inputs: `Kamu adalah KPACA AI, bicaralah bahasa Indonesia sehari-hari, santai, ramah, tidak berlebihan. Pertanyaan: ${req.body.message} Jawaban:`,
-        parameters: { max_new_tokens: 400, temperature: 0.8 }
+        inputs: `Kamu adalah KPACA AI. Jawab santai, bahasa Indonesia sehari-hari. Pertanyaan: ${req.body.message}`,
+        parameters: { max_new_tokens: 300, temperature: 0.8 }
       })
     });
     const hasil = await r.json();
     if(hasil.error) throw new Error(hasil.error.message);
-    const teks = hasil[0].generated_text.split("Jawaban:")[1]?.trim() || hasil[0].generated_text;
-    res.json({jawaban: teks});
+    res.json({jawaban: hasil[0].generated_text});
   } catch (e) {
     res.json({jawaban: "Kesalahan: " + e.message});
   }
@@ -87,5 +86,5 @@ app.post('/api/chat', async (req, res) => {
 
 app.get('/logout', (req,res) => { res.clearCookie('user_id'); res.redirect('/'); });
 
-app.listen(PORT, ()=>console.log("Siap di port", PORT));
+app.listen(PORT, ()=>console.log("Siap"));
 module.exports = app;
