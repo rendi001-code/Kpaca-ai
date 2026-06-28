@@ -10,7 +10,7 @@ const multer = require('multer');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Variabel Lingkungan
+// Ambil dari Pengaturan Lingkungan
 const OR_KEY = process.env.OR_KEY;
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_KEY;
