@@ -2,14 +2,14 @@
   "name": "kpaca-ai",
   "version": "1.0.0",
   "main": "server.js",
-  "scripts": {"start":"node server.js"},
-  "engines": {"node":">=18"},
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": "18.x" },
   "dependencies": {
-    "express":"^4.19.2",
-    "body-parser":"^1.20.2",
-    "bcryptjs":"^2.4.3",
-    "cookie-parser":"^1.4.6",
-    "node-fetch":"^2.7.0",
-    "@supabase/supabase-js":"^2.45.0"
+    "express": "^4.19.2",
+    "body-parser": "^1.20.2",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "node-fetch": "^2.7.0",
+    "@supabase/supabase-js": "^2.45.0"
   }
 }
