@@ -9,10 +9,10 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Kunci Hugging Face kamu
-const HF_TOKEN = "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";
-const SUPABASE_URL = "https://safwstugkkfpnfbabakw.supabase.co";
-const SUPABASE_KEY = "sb_publishable_3MQCz-f8AvoiBOtCfRY0PQ_ASRpiVav";
+// Ambil kunci dari pengaturan Vercel
+const HF_TOKEN = process.env.HF_TOKEN;
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_KEY;
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -44,7 +44,7 @@ app.post('/register', async (req, res) => {
     if(error) return res.send('<script>alert("Sudah dipakai!");history.back();</script>');
     res.redirect('/login');
   } catch {
-    res.send('<script>alert("Kesalahan pendaftaran!");history.back();</script>');
+    res.send('<script>alert("Kesalahan daftar!");history.back();</script>');
   }
 });
 
@@ -52,7 +52,7 @@ app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   try {
     const { data:user, error } = await supabase.from('users').select('*').eq('username',username).single();
-    if(error||!user||!await bcrypt.compare(password, user.password)) return res.send('<script>alert("Salah nama atau sandi!");history.back();</script>');
+    if(error||!user||!await bcrypt.compare(password, user.password)) return res.send('<script>alert("Salah nama/sandi!");history.back();</script>');
     res.cookie('user_id', user.id, { maxAge: 86400000, secure: true, httpOnly: true, sameSite:'lax' });
     res.redirect('/chat');
   } catch {
@@ -60,20 +60,20 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Panggil Hugging Face
 app.post('/api/chat', async (req, res) => {
-  if(!req.cookies.user_id) return res.json({jawaban: "Masuk dulu!"});
+  if(!req.cookies.user_id) return res.json({jawaban: "Masuk dulu ya!"});
+  if(!HF_TOKEN) return res.json({jawaban: "Kunci belum diatur di Vercel!"});
 
   try {
-    const r = await fetch("https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3", {
+    const r = await fetch("https://api-inference.huggingface.co/models/Qwen/Qwen2-7B-Instruct", {
       method:"POST",
       headers:{
         "Authorization": `Bearer ${HF_TOKEN}`,
         "Content-Type": "application/json"
       },
       body:JSON.stringify({
-        inputs: `Kamu adalah KPACA AI. Jawab santai, bahasa Indonesia sehari-hari. Pertanyaan: ${req.body.message}`,
-        parameters: { max_new_tokens: 300, temperature: 0.8 }
+        inputs: `Jawab pakai bahasa Indonesia santai, ramah, tidak kaku: ${req.body.message}`,
+        parameters: { max_new_tokens: 350, temperature: 0.8 }
       })
     });
     const hasil = await r.json();
@@ -86,5 +86,5 @@ app.post('/api/chat', async (req, res) => {
 
 app.get('/logout', (req,res) => { res.clearCookie('user_id'); res.redirect('/'); });
 
-app.listen(PORT, ()=>console.log("Siap"));
+app.listen(PORT, ()=>console.log("Siap di port", PORT));
 module.exports = app;
