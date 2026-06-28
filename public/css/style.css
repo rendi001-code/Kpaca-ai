@@ -1,4 +1,4 @@
-/* Pengaturan Dasar */
+/* === PENGATURAN DASAR === */
 * {
   margin: 0;
   padding: 0;
@@ -6,186 +6,116 @@
   font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
+html,
 body {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 15px;
-}
-
-/* Wadah Utama Obrolan */
-.chat-container {
-  width: 100%;
-  max-width: 750px;
-  height: 92vh;
-  max-height: 850px;
-  background: #ffffff;
-  border-radius: 18px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-  display: flex;
-  flex-direction: column;
+  height: 100%;
   overflow: hidden;
 }
 
-/* Bagian Atas */
-.chat-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 18px 22px;
-  background: #f8f9ff;
-  border-bottom: 1px solid #e9ecef;
+/* === BILAH SAMPING === */
+.samping {
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.logo {
-  font-weight: 700;
-  font-size: 1.4rem;
-  background: linear-gradient(90deg, #667eea, #764ba2);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.samping.buka {
+  transform: translateX(0);
 }
 
-/* Tombol Umum */
-.btn {
-  padding: 8px 16px;
+@media (min-width: 1024px) {
+  .samping {
+    transform: translateX(0);
+    position: static;
+  }
+}
+
+/* === KOTAK PESAN === */
+.pesan {
+  max-width: 85%;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+/* === PRATINJAU GAMBAR === */
+#pratinjauGambar img {
   border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: all 0.2s ease;
+  object-fit: cover;
 }
 
-.btn-sm {
-  padding: 6px 12px;
-  font-size: 0.85rem;
+/* === GAYA GULIRAN === */
+#kotakPesan,
+#daftarRiwayat {
+  scrollbar-width: thin;
+  scrollbar-color: #165DFF transparent;
 }
 
-.btn-outline {
-  background: transparent;
-  border: 1px solid #dc3545;
-  color: #dc3545;
-}
-
-.btn-outline:hover {
-  background: #dc3545;
-  color: white;
-}
-
-.btn-primary {
-  background: linear-gradient(90deg, #667eea, #764ba2);
-  color: white;
-  border-radius: 22px;
-  padding: 10px 24px;
-  font-weight: 600;
-}
-
-.btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-/* Kotak Tempat Pesan */
-.chat-box {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
-  background: #f8f9ff;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-/* Gaya Gulir */
-.chat-box::-webkit-scrollbar {
+#kotakPesan::-webkit-scrollbar,
+#daftarRiwayat::-webkit-scrollbar {
   width: 6px;
 }
 
-.chat-box::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.chat-box::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+#kotakPesan::-webkit-scrollbar-thumb,
+#daftarRiwayat::-webkit-scrollbar-thumb {
+  background: #165DFF;
   border-radius: 3px;
 }
 
-.chat-box::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+/* === ANIMASI SAAT REKAM SUARA === */
+.sedang-merekam {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  animation: denyut 1s infinite;
 }
 
-/* Gaya Pesan */
-.message {
-  max-width: 80%;
-  padding: 12px 16px;
-  border-radius: 20px;
-  line-height: 1.5;
-  font-size: 0.95rem;
-  position: relative;
-  word-wrap: break-word;
-}
-
-.message.ai {
-  background: #e9ecef;
-  color: #2d3748;
-  border-bottom-left-radius: 6px;
-  margin-right: auto;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-.message.user {
-  background: linear-gradient(90deg, #667eea, #764ba2);
-  color: white;
-  border-bottom-right-radius: 6px;
-  margin-left: auto;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);
-}
-
-/* Bagian Masukkan Teks */
-.chat-input-area {
-  display: flex;
-  gap: 10px;
-  padding: 18px 22px;
-  border-top: 1px solid #e9ecef;
-  background: white;
-}
-
-#user-input {
-  flex: 1;
-  padding: 12px 18px;
-  border: 1px solid #dee2e6;
-  border-radius: 24px;
-  font-size: 1rem;
-  outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-#user-input:focus {
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-/* Tampilan di HP */
-@media (max-width: 480px) {
-  .chat-container {
-    height: 95vh;
-    border-radius: 12px;
+@keyframes denyut {
+  0%,
+  100% {
+    opacity: 1;
   }
-  .message {
-    max-width: 85%;
+  50% {
+    opacity: 0.6;
   }
-  .chat-input-area {
-    padding: 12px 15px;
-  }
+}
+
+/* === LATAR BELAKANG GRADASI === */
+.latar-gradasi {
+  background: linear-gradient(135deg, #eff6ff 0%, #e0e7ff 100%);
+}
+
+.dark .latar-gradasi {
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+}
+
+/* === KOTAK TEMBUS PANDANG === */
+.kotak-kaca {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.dark .kotak-kaca {
+  background: rgba(31, 41, 55, 0.8);
+}
+
+/* === KOLOM ISIAN === */
+.input-kustom {
+  transition: all 0.3s ease;
+}
+
+.input-kustom:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(22, 93, 255, 0.15);
+}
+
+/* === PERUBAHAN LAINNYA === */
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  text-decoration: none;
 }
