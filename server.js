@@ -1,19 +1,15 @@
-import express from 'express';
-import bodyParser from 'body-parser';
-import bcrypt from 'bcryptjs';
-import fetch from 'node-fetch';
-import { createClient } from '@supabase/supabase-js';
-import path from 'path';
-import cookieParser from 'cookie-parser';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const express = require('express');
+const bodyParser = require('body-parser');
+const bcrypt = require('bcryptjs');
+const fetch = require('node-fetch');
+const { createClient } = require('@supabase/supabase-js');
+const path = require('path');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Ambil kunci dari pengaturan Vercel
+// Ambil dari pengaturan Vercel
 const OR_KEY = process.env.OR_KEY;
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_KEY;
@@ -67,7 +63,7 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Panggil AI yang stabil
+// Panggil AI
 app.post('/api/chat', async (req, res) => {
   if(!req.cookies.user_id) return res.json({jawaban: "Masuk dulu ya!"});
   if(!OR_KEY) return res.json({jawaban: "Kunci belum diatur!"});
@@ -100,5 +96,5 @@ app.post('/api/chat', async (req, res) => {
 
 app.get('/logout', (req,res) => { res.clearCookie('user_id'); res.redirect('/'); });
 
-app.listen(PORT, ()=>console.log("Siap di port", PORT));
-export default app;
+app.listen(PORT, ()=>console.log("Siap"));
+module.exports = app;
