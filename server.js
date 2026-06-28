@@ -9,10 +9,15 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Ambil kunci dari pengaturan Vercel
+// Ambil dari pengaturan Vercel
 const HF_TOKEN = process.env.HF_TOKEN;
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_KEY;
+
+// Cek jika ada kunci yang hilang
+if (!HF_TOKEN || !SUPABASE_URL || !SUPABASE_KEY) {
+  console.error("Variabel lingkungan belum lengkap!");
+}
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -22,6 +27,7 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
 
+// Halaman
 app.get('/', (req, res) => req.cookies.user_id ? res.redirect('/chat') : res.sendFile(path.join(__dirname, 'public/index.html')));
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public/login.html')));
 app.get('/register', (req, res) => res.sendFile(path.join(__dirname, 'public/register.html')));
@@ -35,6 +41,7 @@ app.get('/chat', async (req, res) => {
   }
 });
 
+// Daftar
 app.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
   if(!username||!email||!password) return res.send('<script>alert("Isi semua kolom!");history.back();</script>');
@@ -48,6 +55,7 @@ app.post('/register', async (req, res) => {
   }
 });
 
+// Masuk
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   try {
@@ -60,9 +68,10 @@ app.post('/login', async (req, res) => {
   }
 });
 
+// Panggil AI
 app.post('/api/chat', async (req, res) => {
   if(!req.cookies.user_id) return res.json({jawaban: "Masuk dulu ya!"});
-  if(!HF_TOKEN) return res.json({jawaban: "Kunci belum diatur di Vercel!"});
+  if(!HF_TOKEN) return res.json({jawaban: "Kunci belum diatur!"});
 
   try {
     const r = await fetch("https://api-inference.huggingface.co/models/Qwen/Qwen2-7B-Instruct", {
