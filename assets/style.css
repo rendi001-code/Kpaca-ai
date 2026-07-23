@@ -1,0 +1,10 @@
+body { background: #0a0a0a; color: #fff; font-family: 'Inter', sans-serif; }
+.glass { background: rgba(26,26,26,0.6); backdrop-filter: blur(10px); border: 1px solid rgba(0,255,136,0.2); }
+.login-bg { background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), var(--bg); background-size: cover; background-position: center; }
+.neon { box-shadow: 0 0 20px #00ff88; }
+.btn-neon { background: #00ff88; color: #000; font-weight: bold; }
+.btn-neon:hover { box-shadow: 0 0 30px #00ff88; }
+.chat-bubble-ai { background: rgba(26,26,26,0.8); border: 1px solid rgba(0,255,136,0.2); }
+.chat-bubble-user { background: #00ff88; color: #000; }
+.menu-item { width: 100%; text-align: left; padding: 8px 12px; display: flex; align-items: center; gap: 12px; border-radius: 8px; }
+.menu-item:hover { background: rgba(0,255,136,0.1); }
