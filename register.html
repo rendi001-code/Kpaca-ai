@@ -1,0 +1,19 @@
+<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daftar - KPACA AI</title><script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="assets/style.css">
+<script src="assets/config.js"></script></head><body class="login-bg h-screen flex items-center justify-center" id="regBody">
+<div class="glass rounded-2xl p-8 w-96">
+<h1 class="text-3xl font-bold text-center mb-2 text-[#00ff88]">Buat Akun KPACA AI</h1>
+<form id="regForm"><input id="name" placeholder="Nama" required class="w-full p-3 mb-4 rounded-lg bg-black/50 border border-[#00ff88]/30 text-white">
+<input id="email" type="email" placeholder="Email" required class="w-full p-3 mb-4 rounded-lg bg-black/50 border-[#00ff88]/30 text-white">
+<input id="password" type="password" placeholder="Password" required class="w-full p-3 mb-4 rounded-lg bg-black/50 border border-[#00ff88]/30 text-white">
+<input id="cpass" type="password" placeholder="Konfirmasi Password" required class="w-full p-3 mb-6 rounded-lg bg-black/50 border border-[#00ff88]/30 text-white">
+<button class="btn-neon w-full p-3 rounded-lg">Buat Akun KPACA AI</button></form>
+<p class="text-center mt-4 text-sm">Sudah punya akun? <a href="login.html" class="text-[#00ff88]">Login</a></p>
+</div><script>
+document.getElementById('regBody').style.setProperty('--bg', `url(${CONFIG.login_bg_url})`);
+document.getElementById('regForm').onsubmit = (e) => {
+e.preventDefault(); if(password.value!== cpass.value) return alert('Password tidak sama');
+const users = JSON.parse(localStorage.getItem('kpaca_ai_users') || '[]');
+users.push({name: name.value, email: email.value, password: password.value});
+localStorage.setItem('kpaca_ai_users', JSON.stringify(users)); alert('Akun berhasil dibuat!'); window.location = 'login.html';
+}</script></body></html>
