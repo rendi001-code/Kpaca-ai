@@ -1,0 +1,18 @@
+<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - KPACA AI</title><script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="assets/style.css">
+<script src="assets/config.js"></script></head><body class="login-bg h-screen flex items-center justify-center" id="loginBody">
+<div class="glass rounded-2xl p-8 w-96">
+<h1 class="text-3xl font-bold text-center mb-2 text-[#00ff88]">KPACA AI</h1>
+<p class="text-center text-gray-400 mb-6">Masuk ke akun kamu</p>
+<form id="loginForm"><input id="email" type="email" placeholder="Email" required class="w-full p-3 mb-4 rounded-lg bg-black/50 border-[#00ff88]/30 text-white">
+<input id="password" type="password" placeholder="Password" required class="w-full p-3 mb-6 rounded-lg bg-black/50 border-[#00ff88]/30 text-white">
+<button class="btn-neon w-full p-3 rounded-lg">Masuk ke KPACA AI</button></form>
+<p class="text-center mt-4 text-sm">Belum punya akun? <a href="register.html" class="text-[#00ff88]">Daftar</a></p>
+</div><script>
+document.getElementById('loginBody').style.setProperty('--bg', `url(${CONFIG.login_bg_url})`);
+document.getElementById('loginForm').onsubmit = (e) => {
+e.preventDefault(); const users = JSON.parse(localStorage.getItem('kpaca_ai_users') || '[]');
+const user = users.find(u => u.email === email.value && u.password === password.value);
+if(user){ localStorage.setItem('kpaca_ai_login', JSON.stringify(user)); window.location = 'index.html'; }
+else { alert('Email atau Password salah') }
+}</script></body></html>
