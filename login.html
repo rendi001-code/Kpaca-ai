@@ -3,16 +3,14 @@
 <link rel="stylesheet" href="assets/style.css"></head>
 <body class="h-screen flex items-center justify-center"><div class="glass rounded-2xl p-8 w-96">
 <h1 class="text-3xl font-bold text-center mb-2 text-[var(--neon)]">KPACA AI</h1><p style="color:var(--text-2)" class="text-center mb-6">Masuk ke akun kamu</p>
-<button id="btn-github" class="w-full p-3 mb-4 rounded-lg glass border-[var(--border)] flex items-center justify-center gap-2 hover:border-[var(--neon)]">
-<i data-lucide="github"></i> Lanjut dengan GitHub</button>
+<button id="btn-github" class="w-full p-3 mb-4 rounded-lg glass border-[var(--border)] flex items-center justify-center gap-2 hover:border-[var(--neon)]"><i data-lucide="github"></i> Lanjut dengan GitHub</button>
 <div class="flex items-center gap-2 mb-4" style="color:var(--text-2)"><div class="h-px bg-[var(--border)] flex-1"></div>ATAU<div class="h-px bg-[var(--border)] flex-1"></div></div>
 <form id="loginForm"><input id="email" type="email" placeholder="Email" required class="w-full p-3 mb-4 rounded-lg bg-black/30 border-[var(--border)] text-[var(--text)]">
-<input id="password" type="password" placeholder="Password" required class="w-full p-3 mb-6 rounded-lg bg-black/30 border-[var(--border)] text-[var(--text)]">
+<input id="password" type="password" placeholder="Password" required class="w-full p-3 mb-6 rounded-lg bg-black/30 border border-[var(--border)] text-[var(--text)]">
 <button class="btn-neon w-full p-3 rounded-lg">Masuk</button></form>
 <p class="text-center mt-4 text-sm" style="color:var(--text-2)">Belum punya akun? <a href="register.html" class="text-[var(--neon)]">Daftar</a></p></div>
 <script src="assets/config.js"></script><script type="module">
 import { signin, supabase } from './assets/supabase.js'; lucide.createIcons();
-btn-github.onclick = async () => { await supabase.auth.signInWithOAuth({ provider: 'github', options: { redirectTo: window.location.origin + '/index.html' } }) }
-document.getElementById('loginForm').onsubmit = async (e) => { e.preventDefault();
-try{ await signin(email.value, password.value); window.location = 'index.html'; }catch(err){ alert(err.message) } }
+document.getElementById('btn-github').onclick = async () => { await supabase.auth.signInWithOAuth({ provider: 'github', options: { redirectTo: window.location.origin + '/index.html' } }) }
+document.getElementById('loginForm').onsubmit = async (e) => { e.preventDefault(); try{ await signin(document.getElementById('email').value, document.getElementById('password').value); window.location = 'index.html'; }catch(err){ alert(err.message) } }
 </script></body></html>
