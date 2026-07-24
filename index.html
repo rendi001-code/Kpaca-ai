@@ -1,27 +1,68 @@
 <!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KPACA AI</title><script src="https://cdn.tailwindcss.com"></script><script src="https://unpkg.com/lucide@latest"></script>
 <link rel="stylesheet" href="assets/style.css"></head>
-<body class="pb-24"><header class="p-4 flex justify-between items-center sticky top-0 glass z-20 border-b border-[var(--border)]">
-<h1 class="text-2xl font-bold text-[var(--neon)]">KPACA AI</h1>
-<div class="flex gap-2"><button id="btn-theme" class="p-2 glass rounded-lg"><i data-lucide="sun-moon"></i></button>
-<a href="chat.html" class="btn-neon px-4 py-2 rounded-xl text-sm">Chat Baru</a>
-<button onclick="window.location='owner.html'" class="p-2 glass rounded-lg"><i data-lucide="settings"></i></button></div></header>
-<main class="p-4"><div class="text-center py-10"><h2 class="text-3xl font-bold mb-2">Apa yang bisa KPACA AI bantu?</h2>
-<p style="color:var(--text-2)">Asisten AI 100+ Bahasa</p></div>
-<h2 class="text-lg font-bold mb-3">Quick Action</h2>
-<div class="grid grid-cols-2 gap-3"><button onclick="goChat('Buat Kode')" class="glass p-5 rounded-2xl flex-col items-center gap-2"><i data-lucide="code" class="text-[var(--neon)]"></i><span class="font-semibold">Buat Kode</span></button>
-<button onclick="goChat('Tulis Artikel')" class="glass p-5 rounded-2xl flex-col items-center gap-2"><i data-lucide="pen" class="text-[var(--neon)]"></i><span class="font-semibold">Tulis Artikel</span></button>
-<button onclick="goChat('Riset')" class="glass p-5 rounded-2xl flex-col items-center gap-2"><i data-lucide="search" class="text-[var(--neon)]"></i><span class="font-semibold">Riset</span></button>
-<button onclick="goChat('Translate')" class="glass p-5 rounded-2xl flex flex-col items-center gap-2"><i data-lucide="languages" class="text-[var(--neon)]"></i><span class="font-semibold">Translate</span></button></div></main>
-<nav class="fixed bottom-0 left-0 right-0 glass border-t border-[var(--border)] flex justify-around p-3">
-<a href="index.html" class="flex flex-col items-center text-[var(--neon)]"><i data-lucide="home"></i><span class="text-xs">Home</span></a>
-<a href="chat.html" class="flex flex-col items-center" style="color:var(--text-2)"><i data-lucide="message-circle"></i><span class="text-xs">Chat</span></a>
-<a href="canvas.html" class="flex flex-col items-center" style="color:var(--text-2)"><i data-lucide="layout-grid"></i><span class="text-xs">Canvas</span></a>
-<a href="gallery.html" class="flex flex-col items-center" style="color:var(--text-2)"><i data-lucide="image"></i><span class="text-xs">Galeri</span></a></nav>
-<script src="assets/config.js"></script><script type="module">
-import { checkAuth, getUser, getTheme, saveTheme } from './assets/supabase.js';
-await checkAuth(); lucide.createIcons();
-const user = await getUser(); const t = await getTheme(user.id); if(t==='light') document.body.classList.add('light');
-btn-theme.onclick = () => { const newTheme = document.body.classList.contains('light')? 'dark' : 'light'; document.body.classList.toggle('light'); saveTheme(user.id, newTheme); }
-function goChat(prompt){ localStorage.setItem('kpaca_ai_prompt', prompt); window.location='chat.html'; } window.goChat = goChat;
+<body class="flex h-screen overflow-hidden">
+<aside id="sidebar" class="w-64 glass border-r border-[var(--border)] flex-col hidden md:flex">
+<div class="p-3"><button id="btn-newchat-side" class="w-full btn-neon p-2 rounded-lg flex items-center justify-center gap-2"><i data-lucide="plus"></i> Chat Baru</button></div>
+<div id="sidebar-chats" class="flex-1 overflow-y-auto p-2"></div>
+<div class="p-2 border-t border-[var(--border)]"><button id="btn-logout-side" class="menu-item w-full text-red-400"><i data-lucide="log-out"></i> Logout</button></div></aside>
+
+<div class="flex-1 flex flex-col">
+<header class="p-3 flex justify-between items-center glass border-b border-[var(--border)] z-20">
+<div class="flex items-center gap-2">
+<button id="btn-toggle-sidebar" class="p-2 rounded-lg hover:bg-[var(--neon)]/10 md:hidden"><i data-lucide="panel-left"></i></button>
+<h1 class="text-xl font-bold text-[var(--neon)]">KPACA AI</h1></div>
+<div class="flex gap-2 items-center">
+<select id="model-select" class="bg-black/50 border-[var(--border)] rounded-lg p-2 text-sm text-[var(--text)]"></select>
+<button id="btn-theme" class="p-2 glass rounded-lg"><i data-lucide="sun-moon"></i></button>
+<button id="btn-menu" class="p-2 glass rounded-lg"><i data-lucide="ellipsis-vertical"></i></button></div></header>
+
+<div id="menu-dropdown" class="hidden fixed right-4 top-14 w-64 glass rounded-2xl p-2 shadow-2xl z-50">
+<button onclick="document.getElementById('lang-select').focus()" class="menu-item w-full"><i data-lucide="languages"></i> Ganti Bahasa</button>
+<button onclick="window.location='owner.html'" class="menu-item w-full"><i data-lucide="shield"></i> Owner Panel</button></div>
+
+<main id="chat-area" class="flex-1 overflow-y-auto">
+<div class="w-full max-w-3xl mx-auto p-4">
+<div id="welcome" class="text-center py-20">
+<h2 class="text-4xl font-bold mb-2">Apa yang bisa KPACA AI bantu?</h2>
+<p style="color:var(--text-2)">Ketik /imagine prompt untuk generate gambar AI</p></div></div></main>
+
+<div class="glass border-t border-[var(--border)]">
+<div class="w-full max-w-3xl mx-auto p-4">
+<div class="flex items-center gap-2 mb-2">
+<select id="lang-select" class="bg-black/50 border-[var(--border)] rounded-lg p-2 text-sm flex-1 text-[var(--text)]"></select></div>
+<div class="glass rounded-2xl p-2 flex items-center gap-2">
+<button id="btn-plus" class="p-2"><i data-lucide="plus"></i></button>
+<label class="p-2 cursor-pointer"><i data-lucide="camera"></i><input id="file-upload" type="file" accept="image/*" class="hidden"></label>
+<input id="prompt" placeholder="Kirim pesan... /imagine kucing neon" class="flex-1 bg-transparent outline-none text-[var(--text)]">
+<button id="btn-mic" class="p-2"><i data-lucide="mic"></i></button>
+<button id="btn-send" class="btn-neon p-2 rounded-xl"><i data-lucide="send"></i></button></div></div></div></div>
+
+<script src="assets/config.js"></script><script src="assets/ai.js"></script>
+<script type="module">
+import { checkAuth, getUser, getTheme, saveTheme, saveLang, getLang, createChat, saveMessage, getChats, uploadImage, supabase, logout } from './assets/supabase.js';
+document.addEventListener('DOMContentLoaded', async () => {
+  lucide.createIcons(); await checkAuth(); const user = await getUser(); const t = await getTheme(user.id); if(t==='light') document.body.classList.add('light');
+  let currentChat = await createChat(user.id, 'Chat Baru');
+  CONFIG.default_models.forEach(m => document.getElementById('model-select').innerHTML += `<option>${m}</option>`)
+  Object.keys(CONFIG.languages).forEach(k => document.getElementById('lang-select').innerHTML += `<option value="${k}">${CONFIG.languages[k]}</option>`)
+  const userLang = await getLang(user.id); document.getElementById('lang-select').value = userLang; document.getElementById('lang-select').onchange = () => saveLang(user.id, document.getElementById('lang-select').value);
+  async function loadSidebar(){ const chats = await getChats(user.id); document.getElementById('sidebar-chats').innerHTML = chats.map(c => `<button onclick="loadOldChat('${c.id}')" class="w-full text-left p-2 rounded-lg hover:bg-[var(--neon)]/10 truncate">${c.title}</button>`).join('') }
+  loadSidebar();
+  document.getElementById('btn-toggle-sidebar').onclick = () => document.getElementById('sidebar').classList.toggle('hidden');
+  document.getElementById('btn-theme').onclick = () => { const newTheme = document.body.classList.contains('light')? 'dark' : 'light'; document.body.classList.toggle('light'); saveTheme(user.id, newTheme); }
+  document.getElementById('btn-menu').onclick = () => document.getElementById('menu-dropdown').classList.toggle('hidden');
+  document.getElementById('btn-logout-side').onclick = async () => { await logout(); window.location='login.html' }
+  document.getElementById('btn-newchat-side').onclick = async () => { currentChat = await createChat(user.id, 'Chat Baru ' + new Date().toLocaleTimeString()); document.querySelector('#chat-area.max-w-3xl').innerHTML = document.getElementById('welcome').outerHTML; loadSidebar(); lucide.createIcons(); }
+  window.loadOldChat = async (id) => { currentChat = {id}; const {data} = await supabase.from('messages').select('*').eq('chat_id',id).order('created_at'); document.querySelector('#chat-area.max-w-3xl').innerHTML=''; data.forEach(m => addMessage(m.role, m.content, m.id)); }
+  document.getElementById('btn-plus').onclick = () => { const menu = document.createElement('div'); menu.className = 'absolute bottom-24 left-4 glass rounded-xl p-2 w-44 z-50'; menu.innerHTML = `<button onclick="document.getElementById('file-upload').click(); this.parentElement.remove()" class="menu-item w-full"><i data-lucide="image"></i> Upload Gambar</button>`; document.body.appendChild(menu); lucide.createIcons(); setTimeout(() => document.addEventListener('click', () => menu.remove(), {once:true}), 100); }
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(SpeechRecognition){ const recognition = new SpeechRecognition(); recognition.onresult = (e) => { document.getElementById('prompt').value = e.results[0][0].transcript; } document.getElementById('btn-mic').onclick = () => { recognition.lang = document.getElementById('lang-select').value === 'id'? 'id-ID' : 'en-US'; recognition.start(); document.getElementById('btn-mic').classList.add('text-[var(--neon)]'); } recognition.onend = () => { document.getElementById('btn-mic').classList.remove('text-[var(--neon)]'); } } else { document.getElementById('btn-mic').style.display = 'none'; }
+  document.getElementById('btn-send').onclick = async () => {
+    const p = document.getElementById('prompt').value; if(!p) return; document.getElementById('welcome')?.remove();
+    if(p.toLowerCase().startsWith('/imagine ')){ const imagePrompt = p.substring(9); const msgId = Date.now(); addMessage('user', p, msgId); await saveMessage(currentChat.id, 'user', p); document.getElementById('prompt').value=''; showLoading(); const imageUrl = await generateImage(imagePrompt); document.querySelector('#chat-area.max-w-3xl div:last-child').remove(); addMessage('assistant', `<img src="${imageUrl}" class="rounded-xl max-w-md"><p class="text-sm mt-2" style="color:var(--text-2)">Prompt: ${imagePrompt}</p>`, Date.now()); await saveMessage(currentChat.id, 'assistant', `[Gambar]: ${imageUrl}`); loadSidebar(); return; }
+    const selectedLang = document.getElementById('lang-select').value; const langInstruction = selectedLang === 'auto'? `Jawab dengan bahasa yang sama dengan pertanyaan user.` : `WAJIB jawab dalam bahasa: ${CONFIG.languages[selectedLang]}`; const msgId = Date.now(); addMessage('user', p, msgId); await saveMessage(currentChat.id, 'user', p); document.getElementById('prompt').value=''; showLoading(); const res = await callOpenRouter(`${langInstruction}\n\nPertanyaan: ${p}`); const aiReply = res.choices[0].message.content; document.querySelector('#chat-area.max-w-3xl div:last-child').remove(); addMessage('assistant', aiReply, Date.now()); await saveMessage(currentChat.id, 'assistant', aiReply); loadSidebar();
+  }
+  document.getElementById('file-upload').onchange = async (e) => { const file = e.target.files[0]; if(!file) return; document.getElementById('welcome')?.remove(); const url = await uploadImage(file, user.id); const msgId = Date.now(); addMessage('user', `<img src="${url}" class="rounded-xl max-w-xs">`, msgId); await saveMessage(currentChat.id, 'user', `[Gambar]: ${url}`); showLoading(); const res = await callOpenRouter(`Jelaskan gambar ini: ${url}`); const aiReply = res.choices[0].message.content; document.querySelector('#chat-area.max-w-3xl div:last-child').remove(); addMessage('assistant', aiReply, Date.now()); await saveMessage(currentChat.id, 'assistant', aiReply); loadSidebar(); }
+});
 </script></body></html>
