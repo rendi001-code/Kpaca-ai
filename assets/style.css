@@ -1,9 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 :root { --bg-1: #0a0a0a; --bg-2: #001a0f; --card: rgba(26,26,26,0.6); --text: #ffffff; --text-2: #a0a0a0; --border: rgba(0,255,136,0.15); --neon: #00ff88; --neon-text: #000; }
 body.light { --bg-1: #f5f5f5; --bg-2: #e0ffe8; --card: rgba(255,255,255,0.7); --text: #111; --text-2: #555; --border: rgba(0,128,85,0.2); --neon: #00a85c; --neon-text: #fff; }
-body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 50%, var(--bg-1) 100%); color: var(--text); min-height: 100vh; }
+body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 50%, var(--bg-1) 100%); color: var(--text); }
 .glass { background: var(--card); backdrop-filter: blur(16px); border: 1px solid var(--border); }
 .btn-neon { background: var(--neon); color: var(--neon-text); font-weight: 700; box-shadow: 0 0 15px rgba(0,255,136,0.4); transition:.2s; }
 .btn-neon:hover { box-shadow: 0 0 25px rgba(0,255,136,0.7); }
-.menu-item { width: 100%; text-align: left; padding: 8px 12px; display: flex; align-items: center; gap: 12px; border-radius: 8px; color: var(--text); }
+.menu-item { width: 100%; text-align: left; padding: 8px 12px; display: flex; align-items: center; gap: 12px; border-radius: 8px; color: var(--text); cursor:pointer; }
 .menu-item:hover { background: rgba(0,255,136,0.1); }
+.message-actions { position: absolute; background: var(--card); backdrop-filter: blur(16px); border: 1px solid var(--border); border-radius: 12px; padding: 6px; box-shadow: 0 8px 30px rgba(0,0,0,0.4); z-index: 100; display: none; width: 220px; }
+.message-actions button { width: 100%; text-align: left; padding: 8px 12px; border-radius: 8px; display: flex; align-items: center; gap: 10px; color: var(--text); font-size: 14px; }
+.message-actions button:hover { background: rgba(0,255,136,0.1); }
+.message-bubble { position: relative; }
