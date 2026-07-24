@@ -1,16 +1,27 @@
 <!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KPACA AI</title><script src="https://cdn.tailwindcss.com"></script><script src="https://unpkg.com/lucide@latest"></script>
-<link rel="stylesheet" href="assets/style.css"></head><body class="bg-black p-4">
-<script>if(!localStorage.getItem('kpaca_ai_login')) window.location='login.html';</script>
-<header class="flex justify-between items-center mb-8"><h1 class="text-2xl font-bold text-[#00ff88]">KPACA AI</h1>
-<a href="chat.html" class="btn-neon px-4 py-2 rounded-lg">Chat Baru</a></header>
-<div class="grid grid-cols-3 gap-4 mb-8">
-<div class="glass p-4 rounded-xl"><p class="text-sm text-gray-400">Hemat Waktu</p><p class="text-2xl font-bold">23 Jam</p></div>
-<div class="glass p-4 rounded-xl"><p class="text-sm text-gray-400">Cuaca</p><p class="text-2xl font-bold">28°C</p></div>
-<div class="glass p-4 rounded-xl"><p class="text-sm text-gray-400">To-do</p><p class="text-2xl font-bold">3 Tugas</p></div>
-</div>
-<h2 class="text-xl font-bold mb-4">Quick Action</h2>
-<div class="grid grid-cols-4 gap-3"><button class="glass p-4 rounded-xl">Buat Kode</button><button class="glass p-4 rounded-xl">Tulis Artikel</button>
-<button class="glass p-4 rounded-xl">Riset</button><button class="glass p-4 rounded-xl">Translate</button></div>
-<footer class="mt-12 text-center text-gray-500">© 2026 KPACA AI | <a href="#">Telegram</a> | <a href="#">WA</a></footer>
-<script>lucide.createIcons();</script></body></html>
+<link rel="stylesheet" href="assets/style.css"></head>
+<body class="pb-24"><header class="p-4 flex justify-between items-center sticky top-0 glass z-20 border-b border-[var(--border)]">
+<h1 class="text-2xl font-bold text-[var(--neon)]">KPACA AI</h1>
+<div class="flex gap-2"><button id="btn-theme" class="p-2 glass rounded-lg"><i data-lucide="sun-moon"></i></button>
+<a href="chat.html" class="btn-neon px-4 py-2 rounded-xl text-sm">Chat Baru</a>
+<button onclick="window.location='owner.html'" class="p-2 glass rounded-lg"><i data-lucide="settings"></i></button></div></header>
+<main class="p-4"><div class="text-center py-10"><h2 class="text-3xl font-bold mb-2">Apa yang bisa KPACA AI bantu?</h2>
+<p style="color:var(--text-2)">Asisten AI 100+ Bahasa</p></div>
+<h2 class="text-lg font-bold mb-3">Quick Action</h2>
+<div class="grid grid-cols-2 gap-3"><button onclick="goChat('Buat Kode')" class="glass p-5 rounded-2xl flex-col items-center gap-2"><i data-lucide="code" class="text-[var(--neon)]"></i><span class="font-semibold">Buat Kode</span></button>
+<button onclick="goChat('Tulis Artikel')" class="glass p-5 rounded-2xl flex-col items-center gap-2"><i data-lucide="pen" class="text-[var(--neon)]"></i><span class="font-semibold">Tulis Artikel</span></button>
+<button onclick="goChat('Riset')" class="glass p-5 rounded-2xl flex-col items-center gap-2"><i data-lucide="search" class="text-[var(--neon)]"></i><span class="font-semibold">Riset</span></button>
+<button onclick="goChat('Translate')" class="glass p-5 rounded-2xl flex flex-col items-center gap-2"><i data-lucide="languages" class="text-[var(--neon)]"></i><span class="font-semibold">Translate</span></button></div></main>
+<nav class="fixed bottom-0 left-0 right-0 glass border-t border-[var(--border)] flex justify-around p-3">
+<a href="index.html" class="flex flex-col items-center text-[var(--neon)]"><i data-lucide="home"></i><span class="text-xs">Home</span></a>
+<a href="chat.html" class="flex flex-col items-center" style="color:var(--text-2)"><i data-lucide="message-circle"></i><span class="text-xs">Chat</span></a>
+<a href="canvas.html" class="flex flex-col items-center" style="color:var(--text-2)"><i data-lucide="layout-grid"></i><span class="text-xs">Canvas</span></a>
+<a href="gallery.html" class="flex flex-col items-center" style="color:var(--text-2)"><i data-lucide="image"></i><span class="text-xs">Galeri</span></a></nav>
+<script src="assets/config.js"></script><script type="module">
+import { checkAuth, getUser, getTheme, saveTheme } from './assets/supabase.js';
+await checkAuth(); lucide.createIcons();
+const user = await getUser(); const t = await getTheme(user.id); if(t==='light') document.body.classList.add('light');
+btn-theme.onclick = () => { const newTheme = document.body.classList.contains('light')? 'dark' : 'light'; document.body.classList.toggle('light'); saveTheme(user.id, newTheme); }
+function goChat(prompt){ localStorage.setItem('kpaca_ai_prompt', prompt); window.location='chat.html'; } window.goChat = goChat;
+</script></body></html>
