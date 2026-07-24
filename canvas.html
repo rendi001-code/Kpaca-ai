@@ -1,19 +1,6 @@
 <!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Canvas - KPACA AI</title><script src="https://cdn.tailwindcss.com"></script><script src="https://unpkg.com/lucide@latest"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
-<link rel="stylesheet" href="assets/style.css"></head><body class="bg-black">
-<script>if(!localStorage.getItem('kpaca_ai_login')) window.location='login.html';</script>
-<header class="glass p-3 flex justify-between"><h1 class="font-bold text-[#00ff88]">Canvas - KPACA AI</h1>
-<button onclick="saveCanvas()" class="btn-neon px-4 py-2 rounded-lg">Simpan & Export HTML</button></header>
-<div class="flex h-[calc(100vh-60px)]">
-  <textarea id="code" class="w-1/2 h-full bg-[#0a0a0a] text-white p-4"></textarea>
-  <iframe id="preview" class="w-1/2 h-full bg-white"></iframe>
-</div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
-<script>
-const editor = CodeMirror.fromTextArea(document.getElementById("code"), {mode: "htmlmixed", lineNumbers: true});
-editor.on("change", () => preview.srcdoc = editor.getValue());
-function saveCanvas(){ localStorage.setItem('kpaca_ai_canvas', editor.getValue()); alert('Disimpan!') }
-editor.setValue(localStorage.getItem('kpaca_ai_canvas') || '<h1 class="text-[#00ff88]">Halo KPACA AI</h1>');
-</script></body></html>
+<link rel="stylesheet" href="assets/style.css"></head><body><header class="glass p-3 flex justify-between"><h1 class="font-bold text-[var(--neon)]">Canvas</h1>
+<button onclick="alert('Disimpan ke chat!')" class="btn-neon px-4 py-2 rounded-lg">Simpan</button></header>
+<textarea id="canvas-code" class="w-full h-[calc(100vh-60px)] bg-transparent text-[var(--text)] p-4 outline-none" placeholder="Tulis kode HTML/CSS/JS di sini..."></textarea>
+<script src="assets/config.js"></script><script type="module">import { checkAuth, getUser, getTheme } from './assets/supabase.js'; await checkAuth(); const t = await getTheme((await getUser()).id); if(t==='light') document.body.classList.add('light'); lucide.createIcons();</script></body></html>
