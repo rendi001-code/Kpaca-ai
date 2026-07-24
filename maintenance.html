@@ -1,0 +1,10 @@
+<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maintenance - KPACA AI</title><script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="assets/style.css"></head>
+<body class="bg-black h-screen flex items-center justify-center text-center">
+<div><h1 class="text-4xl font-bold text-[#00ff88] mb-4">KPACA AI</h1>
+<p class="text-xl mb-6" id="msg">KPACA AI sedang maintenance</p>
+<p>Update selesai dalam: <span id="countdown" class="text-[#00ff88] font-bold">10:00</span></p></div>
+<script>
+document.getElementById('msg').innerText = CONFIG.maintenance_message;
+let time = 600; setInterval(()=>{ time--; countdown.innerText = `${Math.floor(time/60)}:${('0'+time%60).slice(-2)}`},1000)
+</script></body></html>
