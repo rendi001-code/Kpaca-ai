@@ -1,0 +1,34 @@
+<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chat - KPACA AI</title><script src="https://cdn.tailwindcss.com"></script><script src="https://unpkg.com/lucide@latest"></script>
+<link rel="stylesheet" href="assets/style.css"></head><body class="bg-black">
+<script>if(!localStorage.getItem('kpaca_ai_login')) window.location='login.html';</script>
+<header class="sticky top-0 glass p-4 flex items-center justify-between z-40">
+<div class="flex items-center gap-3"><i data-lucide="menu"></i><h1 class="font-bold text-[#00ff88]">KPACA AI</h1>
+<input id="chat-title" value="Chat Baru" class="bg-transparent border-b border-transparent focus:border-[#00ff88]"></div>
+<div class="flex items-center gap-3"><select id="model-select" class="bg-black/50 border border-[#00ff88]/30 rounded-lg p-2"></select>
+<button id="btn-ai-team" class="p-2 glass rounded-lg"><i data-lucide="users"></i></button>
+<button id="btn-menu" class="p-2 glass rounded-lg"><i data-lucide="ellipsis-vertical"></i></button></div></header>
+<div id="menu-dropdown" class="hidden absolute right-4 top-16 w-64 glass rounded-2xl p-2 shadow-2xl z-50">
+<button class="menu-item"><i data-lucide="plus"></i> Chat Baru</button><button class="menu-item"><i data-lucide="history"></i> Riwayat Chat</button><hr class="border-gray-700 my-2">
+<button class="menu-item"><i data-lucide="users"></i> AI Team Mode</button><button class="menu-item"><i data-lucide="search"></i> Research Mode</button>
+<button class="menu-item"><i data-lucide="shield-check"></i> Fact Check</button><button class="menu-item"><i data-lucide="layout"></i> Buka di Canvas</button><hr class="border-gray-700 my-2">
+<button class="menu-item"><i data-lucide="globe"></i> Ganti Bahasa</button><button class="menu-item"><i data-lucide="palette"></i> Ganti Tema</button>
+<button class="menu-item"><i data-lucide="download"></i> Export Chat</button><hr class="border-gray-700 my-2">
+<button class="menu-item"><i data-lucide="settings"></i> Pengaturan</button><button onclick="window.location='owner.html'" class="menu-item"><i data-lucide="shield"></i> Owner Panel</button>
+<button onclick="localStorage.removeItem('kpaca_ai_login');window.location='login.html'" class="menu-item text-red-400"><i data-lucide="log-out"></i> Logout</button></div>
+<main id="chat-area" class="max-w-3xl mx-auto p-4 pb-32"><div id="welcome" class="text-center mt-20">
+<h2 class="text-2xl font-bold">Apa yang bisa KPACA AI bantu?</h2>
+<div class="grid grid-cols-2 gap-3 mt-6"><button class="glass p-3 rounded-xl">Buatkan kode website</button><button class="glass p-3 rounded-xl">Jelaskan konsep sulit</button>
+<button class="glass p-3 rounded-xl">Tulis caption IG</button><button class="glass p-3 rounded-xl">Riset topik apapun</button></div></div></main>
+<div class="fixed bottom-4 left-1/2 -translate-x-1/2 w-11/12 max-w-3xl">
+<div class="glass rounded-full p-2 flex items-center gap-2"><button><i data-lucide="camera"></i></button>
+<input id="prompt" placeholder="Tanya KPACA AI..." class="flex-1 bg-transparent outline-none"><button><i data-lucide="mic"></i></button>
+<button id="btn-plus"><i data-lucide="plus"></i></button></div></div>
+<div id="popup-plus" class="hidden fixed bottom-20 left-1/2 -translate-x-1/2 glass rounded-2xl p-4 grid-cols-3 gap-3">
+<button class="glass p-3 rounded-xl">Upload File</button><button class="glass p-3 rounded-xl">Upload Gambar</button><button class="glass p-3 rounded-xl">/imagine</button>
+<button class="glass p-3 rounded-xl">Web Search</button><button class="glass p-3 rounded-xl">Canvas</button><button class="glass p-3 rounded-xl">AI Team</button>
+<button class="glass p-3 rounded-xl">Prompt Lib</button><button class="glass p-3 rounded-xl">Translate</button><button class="glass p-3 rounded-xl">Research</button></div>
+<script src="assets/config.js"></script><script src="assets/ai.js"></script>
+<script>lucide.createIcons(); document.getElementById('btn-menu').onclick = () => menu-dropdown.classList.toggle('hidden');
+document.getElementById('btn-plus').onclick = () => popup-plus.classList.toggle('hidden');
+CONFIG.default_models.forEach(m => model-select.innerHTML += `<option>${m}</option>`)</script></body></html>
