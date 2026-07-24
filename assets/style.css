@@ -1,10 +1,9 @@
-body { background: #0a0a0a; color: #fff; font-family: 'Inter', sans-serif; }
-.glass { background: rgba(26,26,26,0.6); backdrop-filter: blur(10px); border: 1px solid rgba(0,255,136,0.2); }
-.login-bg { background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), var(--bg); background-size: cover; background-position: center; }
-.neon { box-shadow: 0 0 20px #00ff88; }
-.btn-neon { background: #00ff88; color: #000; font-weight: bold; }
-.btn-neon:hover { box-shadow: 0 0 30px #00ff88; }
-.chat-bubble-ai { background: rgba(26,26,26,0.8); border: 1px solid rgba(0,255,136,0.2); }
-.chat-bubble-user { background: #00ff88; color: #000; }
-.menu-item { width: 100%; text-align: left; padding: 8px 12px; display: flex; align-items: center; gap: 12px; border-radius: 8px; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+:root { --bg-1: #0a0a0a; --bg-2: #001a0f; --card: rgba(26,26,26,0.6); --text: #ffffff; --text-2: #a0a0a0; --border: rgba(0,255,136,0.15); --neon: #00ff88; --neon-text: #000; }
+body.light { --bg-1: #f5f5f5; --bg-2: #e0ffe8; --card: rgba(255,255,255,0.7); --text: #111; --text-2: #555; --border: rgba(0,128,85,0.2); --neon: #00a85c; --neon-text: #fff; }
+body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 50%, var(--bg-1) 100%); color: var(--text); min-height: 100vh; }
+.glass { background: var(--card); backdrop-filter: blur(16px); border: 1px solid var(--border); }
+.btn-neon { background: var(--neon); color: var(--neon-text); font-weight: 700; box-shadow: 0 0 15px rgba(0,255,136,0.4); transition:.2s; }
+.btn-neon:hover { box-shadow: 0 0 25px rgba(0,255,136,0.7); }
+.menu-item { width: 100%; text-align: left; padding: 8px 12px; display: flex; align-items: center; gap: 12px; border-radius: 8px; color: var(--text); }
 .menu-item:hover { background: rgba(0,255,136,0.1); }
