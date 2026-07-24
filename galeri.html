@@ -1,9 +1,0 @@
-<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Galeri - KPACA AI</title><script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="assets/style.css"></head>
-<body class="p-4"><h1 class="text-2xl font-bold text-[var(--neon)] mb-6">Galeri Gambar</h1><div id="gallery" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
-<script src="assets/config.js"></script><script type="module">
-import { checkAuth, getUser, supabase, getTheme } from './assets/supabase.js'; await checkAuth();
-const t = await getTheme((await getUser()).id); if(t==='light') document.body.classList.add('light');
-const {data} = await supabase.from('images').select('*').order('created_at',{ascending:false});
-gallery.innerHTML = data.map(i => `<img src="${i.url}" class="rounded-xl glass">`).join('')
-</script></body></html>
