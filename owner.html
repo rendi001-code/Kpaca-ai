@@ -1,0 +1,15 @@
+<!DOCTYPE html><html><head><title>Owner Panel - KPACA AI</title><script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="assets/style.css"><script src="assets/config.js"></script></head>
+<body class="bg-black p-6"><script>const login = JSON.parse(localStorage.getItem('kpaca_ai_login')||'{}');</script>
+<h1 class="text-2xl font-bold text-[#00ff88] mb-6">Panel Owner KPACA AI</h1>
+<div class="glass p-4 rounded-xl mb-4"><h3 class="font-bold mb-2">1. Maintenance Mode</h3>
+<button onclick="CONFIG.maintenance=true;alert('ON')" class="btn-neon p-2 rounded">ON</button>
+<button onclick="CONFIG.maintenance=false;alert('OFF')" class="glass p-2 rounded">OFF</button></div>
+<div class="glass p-4 rounded-xl mb-4"><h3 class="font-bold mb-2">2. Ganti Background Login Catbox</h3>
+<input id="bg_url" placeholder="https://files.catbox.moe/..." class="w-full p-2 bg-black/50 rounded">
+<button onclick="CONFIG.login_bg_url = bg_url.value;alert('Tersimpan')" class="btn-neon p-2 rounded mt-2">Simpan</button></div>
+<div class="glass p-4 rounded-xl mb-4"><h3 class="font-bold mb-2">10. API Key OpenRouter</h3>
+<input id="api_key" type="password" placeholder="sk-or-v1-xxx" class="w-full p-2 bg-black/50 rounded">
+<button onclick="localStorage.setItem('kpaca_ai_api_key', btoa(api_key.value));alert('API Key tersimpan!')" class="btn-neon p-2 rounded mt-2">Simpan API Key</button></div>
+<div class="glass p-4 rounded-xl"><h3 class="font-bold mb-2">7. Backup Data</h3>
+<button onclick="alert('Export ZIP semua localStorage')" class="btn-neon p-2 rounded">Download Backup.zip</button></div></body></html>
