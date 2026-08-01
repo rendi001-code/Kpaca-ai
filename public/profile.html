@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - KPACA AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="max-w-2xl mx-auto p-4 md:p-6" style="background: #0a0a0a; min-height: 100vh;">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+            <a href="/index.html" class="text-gray-400 hover:text-white">
+                <i class="fas fa-arrow-left text-xl"></i>
+            </a>
+            <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+                Profile
+            </h1>
+        </div>
+        <button onclick="logout()" class="text-gray-400 hover:text-red-500 transition">
+            <i class="fas fa-sign-out-alt text-xl"></i>
+        </button>
+    </div>
+
+    <!-- Profile Card -->
+    <div class="card mb-6">
+        <div class="flex items-center gap-4">
+            <div class="avatar" id="avatarInitial">KP</div>
+            <div class="flex-1">
+                <h2 class="text-xl font-semibold text-white" id="profileName">Loading...</h2>
+                <p class="text-gray-400 text-sm" id="profileEmail">loading@email.com</p>
+                <div class="mt-1">
+                    <span id="verificationBadge" class="badge-unverified">Belum Verifikasi</span>
+                </div>
+            </div>
+        </div>
+        <div class="mt-4 pt-4 border-t border-[#2a2a2a] text-sm text-gray-400">
+            <i class="fas fa-calendar-alt mr-2"></i>
+            Bergabung: <span id="joinDate">-</span>
+        </div>
+    </div>
+
+    <!-- Menu List -->
+    <div class="space-y-2">
+        <div class="menu-item" onclick="editProfile()">
+            <i class="fas fa-user-edit"></i>
+            <span class="ml-3">Edit Profile</span>
+            <i class="fas fa-chevron-right arrow"></i>
+        </div>
+
+        <div class="menu-item" onclick="changePassword()">
+            <i class="fas fa-key"></i>
+            <span class="ml-3">Ubah Password</span>
+            <i class="fas fa-chevron-right arrow"></i>
+        </div>
+
+        <a href="/index.html" class="menu-item">
+            <i class="fas fa-history"></i>
+            <span class="ml-3">Riwayat Chat</span>
+            <i class="fas fa-chevron-right arrow"></i>
+        </a>
+
+        <div class="menu-item" onclick="toggleTheme()">
+            <i class="fas fa-moon"></i>
+            <span class="ml-3">Mode Gelap</span>
+            <span class="ml-auto text-sm text-gray-500">Aktif</span>
+        </div>
+
+        <a href="https://chat.whatsapp.com/your-channel-link" target="_blank" class="menu-item">
+            <i class="fab fa-whatsapp" style="color: #25D366;"></i>
+            <span class="ml-3">Join Us on WhatsApp Channel</span>
+            <i class="fas fa-chevron-right arrow"></i>
+        </a>
+
+        <div class="menu-item" onclick="showAbout()">
+            <i class="fas fa-info-circle"></i>
+            <span class="ml-3">Tentang KPACA AI</span>
+            <i class="fas fa-chevron-right arrow"></i>
+        </div>
+    </div>
+
+    <div class="mt-8 text-center">
+        <a href="https://chat.whatsapp.com/your-channel-link" target="_blank" class="whatsapp-btn">
+            <i class="fab fa-whatsapp text-2xl"></i>
+            Gabung Channel WhatsApp
+        </a>
+        <p class="text-xs text-gray-500 mt-2">
+            Dapatkan update terbaru dan tips dari KPACA AI
+        </p>
+    </div>
+
+    <div class="text-center mt-8 text-xs text-gray-600">
+        KPACA AI v1.0.0
+    </div>
+</div>
+
+<!-- Modal Edit Profile -->
+<div id="editModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold text-white">Edit Profile</h3>
+            <button onclick="hideModal('editModal')" class="text-gray-400 hover:text-white">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form onsubmit="updateProfile(event)">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-300 mb-1">Nama Lengkap</label>
+                <input type="text" id="editName" class="input-field" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-300 mb-1">Email</label>
+                <input type="email" id="editEmail" class="input-field" disabled>
+                <p class="text-xs text-gray-500 mt-1">Email tidak dapat diubah</p>
+            </div>
+            <button type="submit" class="btn-gradient w-full text-white py-2 rounded-xl font-medium">
+                Simpan Perubahan
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Change Password -->
+<div id="passwordModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold text-white">Ubah Password</h3>
+            <button onclick="hideModal('passwordModal')" class="text-gray-400 hover:text-white">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form onsubmit="changePasswordSubmit(event)">
+            <div class="mb-3">
+                <label class="block text-sm font-medium text-gray-300 mb-1">Password Saat Ini</label>
+                <input type="password" id="currentPassword" class="input-field" placeholder="Masukkan password saat ini" required>
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm font-medium text-gray-300 mb-1">Password Baru</label>
+                <input type="password" id="newPassword" class="input-field" placeholder="Minimal 6 karakter" required minlength="6">
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm font-medium text-gray-300 mb-1">Konfirmasi Password</label>
+                <input type="password" id="confirmNewPassword" class="input-field" placeholder="Ulangi password" required>
+            </div>
+            <div id="passwordError" class="error-message"></div>
+            <button type="submit" class="btn-gradient w-full text-white py-2 rounded-xl font-medium">
+                Ubah Password
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+// ===== CHECK AUTH =====
+const token = localStorage.getItem('token');
+if (!token) {
+    window.location.href = '/login.html';
+}
+
+// ===== SHOW TOAST =====
+function showToast(message, type = 'info') {
+    const colors = {
+        success: '#22c55e',
+        error: '#ef4444',
+        info: '#8b5cf6'
+    };
+    
+    const toast = document.createElement('div');
+    toast.className = 'toast-container';
+    toast.style.borderColor = colors[type];
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// ===== LOAD PROFILE =====
+document.addEventListener('DOMContentLoaded', loadProfile);
+
+async function loadProfile() {
+    try {
+        const response = await fetch('/api/profile', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.status === 401 || response.status === 403) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+            return;
+        }
+
+        if (response.ok) {
+            const data = await response.json();
+            displayProfile(data.user);
+        }
+    } catch (error) {
+        console.error('Error loading profile:', error);
+        showToast('Gagal memuat profile', 'error');
+    }
+}
+
+function displayProfile(user) {
+    document.getElementById('profileName').textContent = user.full_name || 'User';
+    document.getElementById('profileEmail').textContent = user.email || '-';
+    
+    const initial = (user.full_name || 'KP').charAt(0).toUpperCase();
+    document.getElementById('avatarInitial').textContent = initial;
+
+    const badge = document.getElementById('verificationBadge');
+    if (user.is_verified) {
+        badge.textContent = '✅ Terverifikasi';
+        badge.className = 'badge-verified';
+    } else {
+        badge.textContent = '⏳ Belum Verifikasi';
+        badge.className = 'badge-unverified';
+    }
+
+    if (user.created_at) {
+        const date = new Date(user.created_at);
+        document.getElementById('joinDate').textContent = date.toLocaleDateString('id-ID', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
+    }
+
+    document.getElementById('editName').value = user.full_name || '';
+    document.getElementById('editEmail').value = user.email || '';
+}
+
+// ===== MODAL HELPERS =====
+function showModal(modalId) {
+    document.getElementById(modalId).classList.add('show');
+}
+
+function hideModal(modalId) {
+    document.getElementById(modalId).classList.remove('show');
+}
+
+// ===== EDIT PROFILE =====
+function editProfile() {
+    showModal('editModal');
+}
+
+async function updateProfile(e) {
+    e.preventDefault();
+    const fullName = document.getElementById('editName').value.trim();
+
+    if (!fullName) {
+        showToast('Nama tidak boleh kosong', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/profile', {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ full_name: fullName })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            user.full_name = fullName;
+            localStorage.setItem('user', JSON.stringify(user));
+            
+            displayProfile(data.user);
+            hideModal('editModal');
+            showToast('✅ Profile berhasil diperbarui!', 'success');
+        } else {
+            showToast(data.error || 'Gagal update profile', 'error');
+        }
+    } catch (error) {
+        console.error('Update profile error:', error);
+        showToast('Terjadi kesalahan', 'error');
+    }
+}
+
+// ===== CHANGE PASSWORD =====
+function changePassword() {
+    showModal('passwordModal');
+    document.getElementById('currentPassword').value = '';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('confirmNewPassword').value = '';
+    document.getElementById('passwordError').style.display = 'none';
+}
+
+async function changePasswordSubmit(e) {
+    e.preventDefault();
+    
+    const currentPassword = document.getElementById('currentPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmNewPassword').value;
+    const errorEl = document.getElementById('passwordError');
+
+    errorEl.style.display = 'none';
+    errorEl.textContent = '';
+
+    if (newPassword !== confirmPassword) {
+        errorEl.textContent = 'Password tidak sama!';
+        errorEl.style.display = 'block';
+        return;
+    }
+
+    if (newPassword.length < 6) {
+        errorEl.textContent = 'Password minimal 6 karakter!';
+        errorEl.style.display = 'block';
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/change-password', {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                current_password: currentPassword,
+                new_password: newPassword
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            hideModal('passwordModal');
+            showToast('✅ Password berhasil diubah!', 'success');
+        } else {
+            errorEl.textContent = data.error || 'Gagal mengubah password';
+            errorEl.style.display = 'block';
+        }
+    } catch (error) {
+        console.error('Change password error:', error);
+        errorEl.textContent = 'Terjadi kesalahan. Silakan coba lagi.';
+        errorEl.style.display = 'block';
+    }
+}
+
+// ===== TOGGLE THEME =====
+function toggleTheme() {
+    showToast('🌙 Mode gelap selalu aktif di KPACA AI', 'info');
+}
+
+// ===== SHOW ABOUT =====
+function showAbout() {
+    showToast(
+        '🤖 KPACA AI v1.0.0\n\n' +
+        'Fitur:\n' +
+        '• 4 Mode AI (Default, Programmer, Guru, Kreatif)\n' +
+        '• Generate Gambar AI\n' +
+        '• Typewriter Effect\n' +
+        '• Riwayat Chat\n' +
+        '• Voice Input\n' +
+        '• Upload File\n\n' +
+        'Dibuat dengan ❤️ oleh Tim KPACA',
+        'info'
+    );
+}
+
+// ===== LOGOUT =====
+function logout() {
+    if (confirm('Yakin ingin keluar?')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login.html';
+    }
+}
+
+// ===== CLOSE MODAL ON OVERLAY CLICK =====
+document.querySelectorAll('.modal-overlay').forEach(modal => {
+    modal.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.remove('show');
+        }
+    });
+});
+
+// ===== EXPOSE FUNCTIONS =====
+window.editProfile = editProfile;
+window.updateProfile = updateProfile;
+window.changePassword = changePassword;
+window.changePasswordSubmit = changePasswordSubmit;
+window.toggleTheme = toggleTheme;
+window.showAbout = showAbout;
+window.logout = logout;
+window.showModal = showModal;
+window.hideModal = hideModal;
+</script>
+</body>
+</html>
