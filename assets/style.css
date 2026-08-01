@@ -1,8 +1,0 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-:root { --bg-1: #0a0a0a; --bg-2: #111; --card: rgba(30,30,30,0.6); --text: #ffffff; --text-2: #a0a0a0; --border: rgba(255,255,255,0.15); --neon: #ffffff; --neon-text: #000; }
-body.light { --bg-1: #f5f5f5; --bg-2: #ffffff; --card: rgba(255,255,255,0.8); --text: #111; --text-2: #555; --border: rgba(0,0,0,0.1); --neon: #000; --neon-text: #fff; }
-body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 100%); color: var(--text); }
-.glass { background: var(--card); backdrop-filter: blur(16px); border: 1px solid var(--border); }
-.btn-neon { background: var(--neon); color: var(--neon-text); font-weight: 700; transition:.2s; }.btn-neon:hover { opacity: 0.8; }
-.menu-item { width: 100%; text-align: left; padding: 8px 12px; display: flex; align-items: center; gap: 12px; border-radius: 8px; color: var(--text); cursor:pointer; }
-.menu-item:hover { background: rgba(255,255,255,0.1); }
