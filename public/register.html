@@ -103,7 +103,8 @@
                 <div id="registerOtpError" class="error-message"></div>
                 <button type="submit" class="btn-gradient w-full text-white py-3 rounded-xl font-medium text-base">
                     <i class="fas fa-check mr-2"></i> Verifikasi
-                                <button 
+                </button>
+                <button 
                     type="button" 
                     onclick="resendRegisterOTP()" 
                     class="w-full text-sm text-gray-400 hover:text-white mt-3"
@@ -116,6 +117,10 @@
 </div>
 
 <script>
+// =============================================
+// REGISTER.JS - KPACA AI Register Page
+// =============================================
+
 // ===== CHECK AUTH =====
 if (localStorage.getItem('token')) {
     window.location.href = '/index.html';
@@ -144,7 +149,9 @@ function showToast(message, type = 'info') {
     }, 3000);
 }
 
-// ===== HANDLE REGISTER =====
+// =============================================
+// HANDLE REGISTER
+// =============================================
 async function handleRegister(e) {
     e.preventDefault();
     
@@ -156,11 +163,13 @@ async function handleRegister(e) {
     const errorEl = document.getElementById('registerError');
     const successEl = document.getElementById('registerSuccess');
 
+    // Reset messages
     errorEl.style.display = 'none';
     errorEl.textContent = '';
     successEl.style.display = 'none';
     successEl.textContent = '';
 
+    // ===== VALIDASI =====
     if (!fullName || !email || !password || !confirmPassword) {
         errorEl.textContent = 'Semua field harus diisi';
         errorEl.style.display = 'block';
@@ -179,37 +188,61 @@ async function handleRegister(e) {
         return;
     }
 
+    // ===== SEND TO API =====
     try {
+        console.log('📝 Mengirim register ke API...');
+        console.log('📧 Email:', email);
+        console.log('👤 Nama:', fullName);
+
         const response = await fetch('/api/register', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password, full_name: fullName })
+            headers: { 
+                'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify({ 
+                email, 
+                password, 
+                full_name: fullName 
+            })
         });
 
         const data = await response.json();
+        console.log('📥 Response:', data);
 
+        // ===== RESPONSE SUKSES =====
         if (response.ok) {
             registeredEmail = email;
             successEl.textContent = '✅ ' + data.message;
             successEl.style.display = 'block';
             
+            // Sembunyikan form, tampilkan OTP
             document.getElementById('registerForm').style.display = 'none';
             document.getElementById('otpSection').style.display = 'block';
+            
             showToast('📧 Kode OTP telah dikirim ke email Anda', 'success');
-        } else {
+            console.log('✅ Register berhasil, OTP terkirim');
+        } 
+        // ===== RESPONSE ERROR =====
+        else {
             errorEl.textContent = data.error || 'Registrasi gagal';
             errorEl.style.display = 'block';
+            console.error('❌ Register error:', data.error);
         }
-    } catch (error) {
-        errorEl.textContent = 'Terjadi kesalahan. Silakan coba lagi.';
+    } 
+    // ===== NETWORK ERROR =====
+    catch (error) {
+        console.error('❌ Network error:', error);
+        errorEl.textContent = 'Terjadi kesalahan koneksi. Silakan coba lagi.';
         errorEl.style.display = 'block';
-        console.error('Register error:', error);
     }
 }
 
-// ===== VERIFY OTP =====
+// =============================================
+// VERIFY OTP
+// =============================================
 async function handleVerifyOTP(e) {
     e.preventDefault();
+    
     const otp = document.getElementById('registerOtpCode').value;
     const errorEl = document.getElementById('registerOtpError');
 
@@ -222,32 +255,50 @@ async function handleVerifyOTP(e) {
         return;
     }
 
+    if (!otp || otp.length < 6) {
+        errorEl.textContent = 'Masukkan kode OTP 6 digit';
+        errorEl.style.display = 'block';
+        return;
+    }
+
     try {
+        console.log('🔐 Verifikasi OTP untuk:', registeredEmail);
+        console.log('🔑 Kode:', otp);
+
         const response = await fetch('/api/verify-otp', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: registeredEmail, otp })
+            body: JSON.stringify({ 
+                email: registeredEmail, 
+                otp: otp 
+            })
         });
 
         const data = await response.json();
+        console.log('📥 Response verify:', data);
 
         if (response.ok) {
             showToast('✅ Verifikasi berhasil! Silakan login.', 'success');
+            console.log('✅ Verifikasi sukses');
+            
             setTimeout(() => {
                 window.location.href = '/login.html';
             }, 1500);
         } else {
             errorEl.textContent = data.error || 'Kode OTP tidak valid';
             errorEl.style.display = 'block';
+            console.error('❌ Verify error:', data.error);
         }
     } catch (error) {
-        errorEl.textContent = 'Terjadi kesalahan. Silakan coba lagi.';
+        console.error('❌ Network error:', error);
+        errorEl.textContent = 'Terjadi kesalahan koneksi. Silakan coba lagi.';
         errorEl.style.display = 'block';
-        console.error('Verify OTP error:', error);
     }
 }
 
-// ===== RESEND OTP =====
+// =============================================
+// RESEND OTP
+// =============================================
 async function resendRegisterOTP() {
     if (!registeredEmail) {
         showToast('Email tidak ditemukan', 'error');
@@ -255,6 +306,8 @@ async function resendRegisterOTP() {
     }
 
     try {
+        console.log('📧 Resend OTP ke:', registeredEmail);
+
         const response = await fetch('/api/send-otp', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -262,19 +315,23 @@ async function resendRegisterOTP() {
         });
 
         const data = await response.json();
+        console.log('📥 Response resend:', data);
         
         if (response.ok) {
             showToast('📧 Kode OTP baru telah dikirim ke email Anda', 'success');
+            console.log('✅ OTP terkirim ulang');
         } else {
             showToast('Gagal mengirim OTP: ' + (data.error || 'Unknown error'), 'error');
         }
     } catch (error) {
-        console.error('Resend OTP error:', error);
+        console.error('❌ Resend error:', error);
         showToast('Gagal mengirim kode OTP. Silakan coba lagi.', 'error');
     }
 }
 
-// ===== PASSWORD VALIDATION =====
+// =============================================
+// PASSWORD VALIDATION (Real-time)
+// =============================================
 document.getElementById('registerPassword').addEventListener('input', function() {
     const hint = document.getElementById('passwordHint');
     if (this.value.length >= 6) {
@@ -285,6 +342,24 @@ document.getElementById('registerPassword').addEventListener('input', function()
         hint.innerHTML = '<i class="fas fa-info-circle mr-1"></i> Minimal 6 karakter';
     }
 });
+
+// =============================================
+// KEYBOARD SHORTCUTS
+// =============================================
+document.addEventListener('keydown', function(e) {
+    // Enter untuk submit
+    if (e.key === 'Enter' && e.target.closest('form')) {
+        // Biarkan form submit normal
+    }
+    // Escape untuk clear form
+    if (e.key === 'Escape') {
+        document.getElementById('registerError').style.display = 'none';
+        document.getElementById('registerSuccess').style.display = 'none';
+    }
+});
+
+console.log('✅ Register page loaded');
+console.log('📡 API endpoint:', '/api/register');
 </script>
 </body>
 </html>
