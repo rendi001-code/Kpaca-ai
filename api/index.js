@@ -374,7 +374,7 @@ app.post('/api/chat', authenticateToken, async (req, res) => {
             {
                 headers: {
                     'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
-                    'HTTP-Referer': 'https://kpaca-aii-5e92.vercel.app',
+                    'HTTP-Referer': 'https://kpaca-ai.vercel.app',
                     'X-Title': 'KPACA AI',
                     'Content-Type': 'application/json'
                 }
