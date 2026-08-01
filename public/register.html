@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - KPACA AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="min-h-screen flex items-center justify-center p-4" style="background: #0a0a0a;">
+    <div class="card max-w-md w-full">
+        <!-- Logo -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+                KPACA AI
+            </h1>
+            <p class="text-gray-400 text-sm mt-2">Buat Akun Baru</p>
+        </div>
+
+        <!-- Register Form -->
+        <form id="registerForm" onsubmit="handleRegister(event)">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-300 mb-1">Nama Lengkap</label>
+                <input 
+                    type="text" 
+                    id="fullName" 
+                    class="input-field" 
+                    placeholder="masukkan nama lengkap"
+                    required
+                >
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-300 mb-1">Email</label>
+                <input 
+                    type="email" 
+                    id="registerEmail" 
+                    class="input-field" 
+                    placeholder="masukkan email Anda"
+                    required
+                >
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-300 mb-1">Password</label>
+                <input 
+                    type="password" 
+                    id="registerPassword" 
+                    class="input-field" 
+                    placeholder="minimal 6 karakter"
+                    required
+                    minlength="6"
+                >
+                <div class="password-requirements" id="passwordHint">
+                    <i class="fas fa-info-circle mr-1"></i> Minimal 6 karakter
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-300 mb-1">Konfirmasi Password</label>
+                <input 
+                    type="password" 
+                    id="confirmPassword" 
+                    class="input-field" 
+                    placeholder="ulangi password"
+                    required
+                >
+            </div>
+            <div id="registerError" class="error-message"></div>
+            <div id="registerSuccess" class="success-message"></div>
+            <button type="submit" class="btn-gradient w-full text-white py-3 rounded-xl font-medium text-base">
+                <i class="fas fa-user-plus mr-2"></i> Daftar
+            </button>
+        </form>
+
+        <div class="text-center mt-4 text-sm text-gray-400">
+            Sudah punya akun? <a href="/login.html" class="text-purple-500 hover:text-pink-500 transition">Masuk Sekarang</a>
+        </div>
+
+        <!-- OTP Section -->
+        <div id="otpSection" style="display: none;" class="mt-6 pt-6 border-t border-[#2a2a2a]">
+            <div class="text-center mb-4">
+                <i class="fas fa-check-circle text-green-500 text-3xl mb-2"></i>
+                <p class="text-sm text-gray-300">
+                    ✅ Registrasi berhasil! Silakan verifikasi email Anda.
+                </p>
+                <p class="text-xs text-gray-500 mt-1">
+                    Kode OTP telah dikirim ke email Anda
+                </p>
+            </div>
+            <form onsubmit="handleVerifyOTP(event)">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Kode OTP</label>
+                    <input 
+                        type="text" 
+                        id="registerOtpCode" 
+                        class="otp-input" 
+                        placeholder="000000"
+                        maxlength="6"
+                        required
+                    >
+                </div>
+                <div id="registerOtpError" class="error-message"></div>
+                <button type="submit" class="btn-gradient w-full text-white py-3 rounded-xl font-medium text-base">
+                    <i class="fas fa-check mr-2"></i> Verifikasi
+                                <button 
+                    type="button" 
+                    onclick="resendRegisterOTP()" 
+                    class="w-full text-sm text-gray-400 hover:text-white mt-3"
+                >
+                    <i class="fas fa-redo mr-1"></i> Kirim Ulang OTP
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// ===== CHECK AUTH =====
+if (localStorage.getItem('token')) {
+    window.location.href = '/index.html';
+}
+
+let registeredEmail = '';
+
+// ===== SHOW TOAST =====
+function showToast(message, type = 'info') {
+    const colors = {
+        success: '#22c55e',
+        error: '#ef4444',
+        info: '#8b5cf6'
+    };
+    
+    const toast = document.createElement('div');
+    toast.className = 'toast-container';
+    toast.style.borderColor = colors[type];
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// ===== HANDLE REGISTER =====
+async function handleRegister(e) {
+    e.preventDefault();
+    
+    const fullName = document.getElementById('fullName').value.trim();
+    const email = document.getElementById('registerEmail').value.trim();
+    const password = document.getElementById('registerPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    
+    const errorEl = document.getElementById('registerError');
+    const successEl = document.getElementById('registerSuccess');
+
+    errorEl.style.display = 'none';
+    errorEl.textContent = '';
+    successEl.style.display = 'none';
+    successEl.textContent = '';
+
+    if (!fullName || !email || !password || !confirmPassword) {
+        errorEl.textContent = 'Semua field harus diisi';
+        errorEl.style.display = 'block';
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        errorEl.textContent = 'Password tidak sama';
+        errorEl.style.display = 'block';
+        return;
+    }
+
+    if (password.length < 6) {
+        errorEl.textContent = 'Password minimal 6 karakter';
+        errorEl.style.display = 'block';
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password, full_name: fullName })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            registeredEmail = email;
+            successEl.textContent = '✅ ' + data.message;
+            successEl.style.display = 'block';
+            
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('otpSection').style.display = 'block';
+            showToast('📧 Kode OTP telah dikirim ke email Anda', 'success');
+        } else {
+            errorEl.textContent = data.error || 'Registrasi gagal';
+            errorEl.style.display = 'block';
+        }
+    } catch (error) {
+        errorEl.textContent = 'Terjadi kesalahan. Silakan coba lagi.';
+        errorEl.style.display = 'block';
+        console.error('Register error:', error);
+    }
+}
+
+// ===== VERIFY OTP =====
+async function handleVerifyOTP(e) {
+    e.preventDefault();
+    const otp = document.getElementById('registerOtpCode').value;
+    const errorEl = document.getElementById('registerOtpError');
+
+    errorEl.style.display = 'none';
+    errorEl.textContent = '';
+
+    if (!registeredEmail) {
+        errorEl.textContent = 'Email tidak ditemukan';
+        errorEl.style.display = 'block';
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/verify-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: registeredEmail, otp })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            showToast('✅ Verifikasi berhasil! Silakan login.', 'success');
+            setTimeout(() => {
+                window.location.href = '/login.html';
+            }, 1500);
+        } else {
+            errorEl.textContent = data.error || 'Kode OTP tidak valid';
+            errorEl.style.display = 'block';
+        }
+    } catch (error) {
+        errorEl.textContent = 'Terjadi kesalahan. Silakan coba lagi.';
+        errorEl.style.display = 'block';
+        console.error('Verify OTP error:', error);
+    }
+}
+
+// ===== RESEND OTP =====
+async function resendRegisterOTP() {
+    if (!registeredEmail) {
+        showToast('Email tidak ditemukan', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/send-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: registeredEmail })
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+            showToast('📧 Kode OTP baru telah dikirim ke email Anda', 'success');
+        } else {
+            showToast('Gagal mengirim OTP: ' + (data.error || 'Unknown error'), 'error');
+        }
+    } catch (error) {
+        console.error('Resend OTP error:', error);
+        showToast('Gagal mengirim kode OTP. Silakan coba lagi.', 'error');
+    }
+}
+
+// ===== PASSWORD VALIDATION =====
+document.getElementById('registerPassword').addEventListener('input', function() {
+    const hint = document.getElementById('passwordHint');
+    if (this.value.length >= 6) {
+        hint.classList.add('valid');
+        hint.innerHTML = '<i class="fas fa-check-circle text-green-500 mr-1"></i> Password valid';
+    } else {
+        hint.classList.remove('valid');
+        hint.innerHTML = '<i class="fas fa-info-circle mr-1"></i> Minimal 6 karakter';
+    }
+});
+</script>
+</body>
+</html>
