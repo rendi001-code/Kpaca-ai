@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - KPACA AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="min-h-screen flex items-center justify-center p-4" style="background: #0a0a0a;">
+    <div class="card max-w-md w-full">
+        <!-- Logo -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+                KPACA AI
+            </h1>
+            <p class="text-gray-400 text-sm mt-2">Asisten AI Cerdas Anda</p>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-300 mb-1">Email</label>
+                <input 
+                    type="email" 
+                    id="loginEmail" 
+                    class="input-field" 
+                    placeholder="masukkan email Anda"
+                    required
+                >
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-300 mb-1">Password</label>
+                <input 
+                    type="password" 
+                    id="loginPassword" 
+                    class="input-field" 
+                    placeholder="masukkan password"
+                    required
+                >
+            </div>
+            <div id="loginError" class="error-message"></div>
+            <button type="submit" class="btn-gradient w-full text-white py-3 rounded-xl font-medium text-base">
+                Masuk
+            </button>
+        </form>
+
+        <div class="text-center mt-4 text-sm text-gray-400">
+            Belum punya akun? <a href="/register.html" class="text-purple-500 hover:text-pink-500 transition">Daftar Sekarang</a>
+        </div>
+
+        <hr class="border-[#2a2a2a] my-6">
+
+        <!-- OTP Verification Section -->
+        <div id="otpSection" style="display: none;">
+            <p class="text-sm text-gray-300 mb-4 text-center">
+                <i class="fas fa-envelope text-purple-500 mr-2"></i>
+                Kode verifikasi telah dikirim ke email Anda
+            </p>
+            <form onsubmit="handleVerifyOTP(event)">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Kode OTP</label>
+                    <input 
+                        type="text" 
+                        id="otpCode" 
+                        class="otp-input" 
+                        placeholder="000000"
+                        maxlength="6"
+                        required
+                    >
+                </div>
+                <div id="otpError" class="error-message"></div>
+                <button type="submit" class="btn-gradient w-full text-white py-3 rounded-xl font-medium text-base">
+                    Verifikasi
+                </button>
+                <button 
+                    type="button" 
+                    onclick="resendOTP()" 
+                    class="w-full text-sm text-gray-400 hover:text-white mt-3"
+                >
+                    <i class="fas fa-redo mr-1"></i> Kirim Ulang OTP
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// ===== CHECK AUTH =====
+if (localStorage.getItem('token')) {
+    window.location.href = '/index.html';
+}
+
+let pendingEmail = '';
+
+// ===== SHOW TOAST =====
+function showToast(message, type = 'info') {
+    const colors = {
+        success: '#22c55e',
+        error: '#ef4444',
+        info: '#8b5cf6'
+    };
+    
+    const toast = document.createElement('div');
+    toast.className = 'toast-container';
+    toast.style.borderColor = colors[type];
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// ===== HANDLE LOGIN =====
+async function handleLogin(e) {
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    const errorEl = document.getElementById('loginError');
+
+    errorEl.style.display = 'none';
+    errorEl.textContent = '';
+
+    try {
+        const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            showToast('✅ Login berhasil!', 'success');
+            setTimeout(() => {
+                window.location.href = '/index.html';
+            }, 500);
+        } else if (response.status === 403 && data.needsVerification) {
+            pendingEmail = email;
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('otpSection').style.display = 'block';
+            showToast('📧 Kode OTP telah dikirim ke email Anda', 'info');
+        } else {
+            errorEl.textContent = data.error || 'Login gagal';
+            errorEl.style.display = 'block';
+        }
+    } catch (error) {
+        errorEl.textContent = 'Terjadi kesalahan. Silakan coba lagi.';
+        errorEl.style.display = 'block';
+        console.error('Login error:', error);
+    }
+}
+
+// ===== VERIFY OTP =====
+async function handleVerifyOTP(e) {
+    e.preventDefault();
+    const otp = document.getElementById('otpCode').value;
+    const errorEl = document.getElementById('otpError');
+
+    errorEl.style.display = 'none';
+    errorEl.textContent = '';
+
+    if (!pendingEmail) {
+        errorEl.textContent = 'Email tidak ditemukan';
+        errorEl.style.display = 'block';
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/verify-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: pendingEmail, otp })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            showToast('✅ Verifikasi berhasil! Silakan login kembali.', 'success');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } else {
+            errorEl.textContent = data.error || 'Kode OTP tidak valid';
+            errorEl.style.display = 'block';
+        }
+    } catch (error) {
+        errorEl.textContent = 'Terjadi kesalahan. Silakan coba lagi.';
+        errorEl.style.display = 'block';
+        console.error('Verify OTP error:', error);
+    }
+}
+
+// ===== RESEND OTP =====
+async function resendOTP() {
+    if (!pendingEmail) {
+        showToast('Email tidak ditemukan', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/send-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: pendingEmail })
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+            showToast('📧 Kode OTP baru telah dikirim ke email Anda', 'success');
+        } else {
+            showToast('Gagal mengirim OTP: ' + (data.error || 'Unknown error'), 'error');
+        }
+    } catch (error) {
+        console.error('Resend OTP error:', error);
+        showToast('Gagal mengirim kode OTP. Silakan coba lagi.', 'error');
+    }
+}
+</script>
+</body>
+</html>
